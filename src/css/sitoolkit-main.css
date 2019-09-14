@@ -1,0 +1,42 @@
+html, body{
+  hight: 100%;
+}
+
+body{
+  margin: 0;
+  padding: 0;
+  positiion: relative;
+  min-width: 600px;
+  min-height: 400px;
+}
+
+.center{
+  text-align: center;
+  margin: -150px 0 0 -300px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 600px;
+  height: 400px;
+}
+
+.link {
+  font-size: 1.5em;
+  display: inline-block;
+  text-decoration: none;
+  color: #000000;
+  width: 240px;
+  height: 240px;
+  line-height: 240px;
+  border-radius: 50%;
+  border: solid 2px #000000;
+  text-align: center;
+  overflow: hidden;
+  font-weight: bold;
+  transition: .5s;
+}
+
+.link:hover {
+  color: #ffffff;
+  background: #000000;
+}
