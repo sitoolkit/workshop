@@ -76,7 +76,7 @@ yarn global add @vue/cli
 
 ---
 
-### プロジェクト作成 (1/2)
+### プロジェクト作成 1/2
 
 Vue.js のプロジェクトを作成します。
 
@@ -96,7 +96,7 @@ vue create vue-project
 
 ### プロジェクト作成 2/2
 
-対話モードで以下の feature を選択してください。
+対話モードで**Manually select features**を選択し、以下の feature を選択してください。
 
 ```sh
 ? Please pick a preset:
@@ -131,7 +131,7 @@ code vue-project
 ```
 
 code コマンドが有効化されていない場合は、VSCode を手動で起動し、
-**ファイル**メニュー＞**開く**をから上記の vue-project フォルダを選択してください。
+**ファイル**メニュー＞**開く**から上記の vue-project フォルダを選択してください。
 
 以降の説明は特に断りのない限り VSCode の操作です。
 
@@ -207,6 +207,25 @@ yarn serve
 **デバッグ**メニュー＞**デバッグの開始**を選択します。
 
 Chrome が起動し、上記の位置で処理が一時停止します。
+
+---
+
+### LiveReload
+
+開発サーバーを使用するとsrcディレクトリ以下の変更は即座にブラウザに反映されます。(LiveReload機能)
+
+Home.vueの以下の2行をコメントアウトして保存します。
+
+```xml
+<template>
+  <div class="home">
+    <!-- <img alt="Vue logo" src="../assets/logo.png">
+    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/> -->
+  </div>
+</template>
+```
+
+**ターミナル**ビューにトランスパイルのログが出力され、ブラウザは自動的に再描画されて変更後の状態が表示されます。(上記の変更ではVue.jsのロゴ以下が消えます。)
 
 ---
 
@@ -304,8 +323,9 @@ vue コンポーネントの描画結果が表示されます。
 
 template タグ内に"HTML の原型"を実装します。
 
-script タグ内に Vue コンポーネントを実装します。
-Vue コンポーネントのフィールドやメソッドは template 内で参照できます。
+script タグ内に Vue クラスを実装します。
+
+**重要** Vue クラスのフィールドやメソッドは template 内で参照できます。
 
 ```xml
 <template>
@@ -366,6 +386,10 @@ App.vue やその子コンポーネントに組み込んで使用します。
 **題材** : Home.vue に以下のような検索画面を実装します。
 
 <a href="list.html" target="_blank">検索画面サンプル</a>
+
+
+HTMLはこのサンプルのものを使ってもよいです。
+サンプルを開いたら**右クリック**＞**ページのソースを表示**を選択するとHTMLが表示されます。
 
 ---
 
