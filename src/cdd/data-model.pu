@@ -1,0 +1,47 @@
+```@startuml
+
+hide circle
+
+entity order {
+  order_no: number
+---
+  user_name: text
+  address: text
+  request_date: date
+}
+
+
+entity order_detail {
+  order_no: number <<FK>>
+  detail_no: number 
+---
+  product_cd: char
+  quantity: number
+  amount:number
+}
+
+
+
+entity inventory {
+  product_cd: char
+  inventory_no: number
+---
+  quantity: number
+}
+
+
+entity payment {
+  order_no: number <<FK>>
+---
+  payment_status: char
+  payment_type: char
+  credit_card_info: text
+  bank_account_info: text
+}
+
+
+order ||--|{ order_detail
+order ||--|| payment
+
+
+```@enduml

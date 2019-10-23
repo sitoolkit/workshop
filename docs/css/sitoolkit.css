@@ -15,3 +15,7 @@
 .reveal li {
   font-size: 0.8em;
 }
+
+.reveal section img {
+  border-width: 0;
+}

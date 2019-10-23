@@ -2,5 +2,6 @@
   "theme": "white",
   "highlightTheme": "vs2015",
   "css": "src/css/sitoolkit.css",
-  "staticDirs": "src"
+  "staticDirs": "src",
+  "listingTemplate": "listing-template.html"
 }
