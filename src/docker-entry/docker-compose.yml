@@ -1,0 +1,21 @@
+version: "3.7"
+services:
+
+  redmine:
+    image: redmine:alpine
+    ports:
+      - 3000:3000
+    volumes:
+      - redmine_data:/usr/src/redmine
+
+  myjenkins:
+    build:
+      context: ./myjenkins
+    ports:
+      - 8080:8080
+    volumes:
+      - myjenkins_data:/var/jenkins_home
+
+volumes:
+  redmine_data:
+  myjenkins_data:

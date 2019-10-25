@@ -13,12 +13,12 @@ title: Docker入門ハンズオン
 - はじめに
 - 環境の準備
 - Dockerの構成要素
+ - 仮想環境を動かす
  - イメージとコンテナ
  - ボリューム
-- Dockerとは
-- ハンズオン：Dockerの基本操作
+- Dockerの基本操作
 - コンテナの用途
-- ハンズオン：イメージ・composeの作成
+- イメージ・composeの作成
 - まとめ
 
 ---
@@ -74,33 +74,37 @@ $ docker pull jenkins/jenkins:alpine
 
 ---
 
-### イメージとコンテナ(1/4)
+### 仮想環境を動かす
 
-環境準備に記載したコマンドで、DockerイメージをDockerにインストールしました。  
+<div style="font-size:0.9em">
+
+環境準備に記載したコマンドで、**イメージ**と呼ばれる仮想環境のベースをインストールしました。  
 インストールしたイメージは以下のコマンドで確認できます。
 
 ```
 $ docker images
 ```
 
-以下のコマンドでインストールしたRedmineを起動できます。
+以下のコマンドでインストールしたイメージを仮想環境として動かすことができます。
 
 ```
-$ docker run -d -p 8080:3000 redmine:alpine
+$ docker run -d -p 3000:3000 redmine:alpine
 ```
 
-このコマンドで起動したRedmineには[http://localhost:8080/](http://localhost:8080/)でアクセスできます。
+起動した仮想環境を**コンテナ**と呼びます。
 
-デフォルトではID:admin/PW:adminでログインできます。  
-Redmineにログインして、任意のプロジェクトを作成してください。
+Redmineには[http://localhost:3000/](http://localhost:3000/)でアクセスできます。  
+ID:admin/PW:adminで管理者でログインできます。  
+Redmineにログイン、初期パスワードを変更して、任意のプロジェクトを作成してください。
+
+</div>
 
 ---
 
-### イメージとコンテナ(2/4)
+### イメージとコンテナ(1/3)
 
 <div style="font-size:0.9em">
 
-Dockerでは構築した仮想環境をコンテナと呼びます。  
 コンテナは以下のコマンドで確認できます。
 
 ```
@@ -109,7 +113,7 @@ $ docker ps
 
 以下のコマンドでコンテナを停止できます。
 [コンテナID]には**docker ps**で表示した**CONTAINER ID**を指定します。  
-Redmineを一度停止して、再度[http://localhost:8080/](http://localhost:8080/)にアクセスしてください。
+Redmineを一度停止して、再度[http://localhost:3000/](http://localhost:3000/)にアクセスしてください。
 
 ```
 $ docker stop [コンテナID]
@@ -126,9 +130,9 @@ $ docker ps -a
 
 ---
 
-### イメージとコンテナ(3/4)
+### イメージとコンテナ(2/3)
 
-Redmineを起動し、再度[http://localhost:8080/](http://localhost:8080/)にアクセスして、
+Redmineを起動し、再度[http://localhost:3000/](http://localhost:3000/)にアクセスして、
 作成したプロジェクトを確認してください。  
 コンテナの停止ではアプリケーションの変更内容は保存されています。
 
@@ -144,7 +148,7 @@ $ docker ps -a
 
 ---
 
-### イメージとコンテナ(4/4)
+### イメージとコンテナ(3/3)
 
 もう一度コンテナを起動して、Redmineにアクセスしてください。
 Redmineにはアクセスできますが、作成したプロジェクトは存在しません。
@@ -159,12 +163,12 @@ Redmineにはアクセスできますが、作成したプロジェクトは存�
 
 ### ボリューム(1/2)
 
-仮想環境を運用する場合、データの永続化が必要となります。  
+サーバーを運用する場合、データの永続化が必要となります。  
 Dockerではデータ永続化のためのボリュームという機能があります。  
 以下のコマンドでRedmineを起動してください。
 
 ```
-$ docker run -d -p 8080:3000 -v redmine_data:/usr/src/redmine redmine:alpine
+$ docker run -d -p 3000:3000 -v redmine_data:/usr/src/redmine redmine:alpine
 ```
 
 **-v**オプションでコンテナにボリュームと呼ばれる外部記憶領域をマウントすることができます。  
@@ -274,6 +278,10 @@ $ docker rmi [イメージID]
 
 **※環境の準備で用意したRedmine、Jenkinsはこの後使用するため削除しないでください**
 
+その他、実行可能なコマンドは
+[Dockerコマンド](http://docs.docker.jp/engine/reference/commandline/index.html)
+を参照してください。
+
 ---
 
 ## コンテナの用途
@@ -285,9 +293,8 @@ $ docker rmi [イメージID]
 Dockerではコンテナをサーバーとして使用する以外に、単独処理を行うこともできます。
 
 ・サーバー用  
-ここまでで触ったように、通常のサーバーと同様にログインしての作業以外にも、
-コンテナの外からファイル転送やログの確認などができます。  
-Redmine以外にも、DBやLDAP、SMTPなど、様々なイメージが[DockerHub](https://hub.docker.com/)に用意されています。
+ここまでで触ったように、通常のサーバーのように仮想環境でアプリケーションサーバを運用することができます。  
+Redmine以外にも様々なイメージが[DockerHub](https://hub.docker.com/)に用意されています。
 
 ---
 
@@ -297,7 +304,8 @@ Redmine以外にも、DBやLDAP、SMTPなど、様々なイメージが[DockerHu
 docker runで**--rm**オプションを指定すると、コンテナ終了時にコンテナを自動的に削除することができます。
 このオプションを利用することで、サーバーとしてではなく、コンテナを使用して単独処理を行うことができます。
 
-例）ボリュームのバックアップ(弊社プロダクト[sit-ds](https://github.com/sitoolkit/sit-ds)で使用)
+例）ボリュームのバックアップ  
+(弊社プロダクト[sit-ds](https://github.com/sitoolkit/sit-ds)で使用)
 
 ```
 docker run --rm \                                     # --rmオプションを指定してコンテナ起動
@@ -309,95 +317,192 @@ docker run --rm \                                     # --rmオプションを�
 
 ---
 
-## 以下作成中
-
----
-
-## ハンズオン
-
 ## イメージ・Composeの作成
 
 ---
 
-### イメージの作成
+### イメージの作成(1/3)
+
+以下のコマンドでJenkinsを起動してください。
+
+```
+$ docker run -d -p 8080:8080 jenkins/jenkins:alpine
+```
+
+起動後、[http://localhost:8080](http://localhost:8080)にアクセスしてください。  
+Jenkinsの初期設定が始まります。
+
+様々なプロジェクトで開発用サーバーを運用する場合、構築の都度初期設定するのは作業コストがかかります。  
+そこで、管理者ユーザ作成済み、初期設定をスキップするカスタマイズイメージを作成します。
+
+初期設定画面を閉じて、Jenkinsのコンテナ停止・削除してください。
+
+---
+
+### イメージの作成(2/3)
 
 <div style="font-size:0.8em;">
 
-Dockerイメージは、Dockerfileを用意することで自分で作成することができます。  
-イメージの作成には**Dockerfile**を作成する必要があります。  
-以下、nginxにbashをインストール、独自ページを追加するDokcerfileの例です。
+イメージ作成用ファイルをまとめて管理するため、**myjenkins**ディレクトリを作成してください。
+
+Jenkinsの初期設定スクリプトを用意します。
+下記内容をコピーして、**myjenkins**に**create-admin.groovy**という名前で保存してください。
 
 ```
-FROM nginx:alpine                      # 継承元のイメージを指定
-RUN apk add bash                       # コマンドを実行(本例ではbashを追加でインストール）
-ADD mypage.html /usr/share/nginx/html  # ファイルを追加
-CMD ["nginx", "-g", "daemon off;"]     # コンテナ起動時のコマンドを指定
-```
-※参考：[Dockerfileリファレンス](http://docs.docker.jp/engine/reference/builder.html)
+import jenkins.model.*
+import hudson.security.*
 
-Dockerfileを作成したら、以下のコマンドでイメージを作成することができます。
+def adminUsername = "admin"
+def adminPassword = "admin"
 
+def instance = Jenkins.getInstance()
 
-```
-$ docker build -t [REPOSITORY:TAG] [Dockerfile配置ディレクトリ]
-※-tオプションは任意のため指定しなくてもよいが、
-ランダムなイメージIDで識別が必要になるので、オプションの使用を推奨
-REPOSITORY：リポジトリ名、nginx:alpineの場合のnginxにあたる
-TAG：タグ、nginx:alipineのalpineにあたる
+def hudsonRealm = new HudsonPrivateSecurityRealm(false)
+hudsonRealm.createAccount(adminUsername, adminPassword)
+instance.setSecurityRealm(hudsonRealm)
+
+def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
+strategy.setAllowAnonymousRead(false)
+instance.setAuthorizationStrategy(strategy)
+
+instance.save()
 ```
 
 </div>
 
 ---
 
-### Composeの作成
-
-Composeとは、複数のDockerコンテナを使用するDockerアプリケーションを実行するツールです。  
-アプリケーションの定義には、docker-compose.ymlファイルを作成する必要があります。  
-参考：[Composeファイルリファレンス](http://docs.docker.jp/compose/compose-file.html)
-
-作成したdocker-compose.yml定義のアプリケーションは、以下のコマンドで起動します。
-
-```
-$ docker-compose up -d
-※docker-compose.yml配置ディレクトリで実行
-```
-
-docker-composeが実行できるコマンドは概ねdockerコマンドと同様です。    
-参考：[docker-composeコマンド概要](http://docs.docker.jp/compose/reference/overview.html)
-
----
-
-### ハンズオン(1/2)
-
-#### Dockerイメージの作成
-  
-以下のイメージを作成する。
-* ベースイメージ - nginx:alpine
-* 独自のページを事前に追加する
-* Listenポートを8080とし、コンテナへの解放ポートも8080とする  
-* docker run -d -p 8080:8080 [イメージ]でコンテナを起動、http://localhost:8080/[任意ページ] でアクセスを確認
-
----
-
-### ハンズオン(2/2)
-
-#### Composeの作成
+### イメージの作成(3/3)
 
 <div style="font-size:0.8em;">
 
-以下のComposeを作成する。
-* ベースイメージ1 - httpd:alpine
- * 独自のページを事前に追加する
- * httpdのListenポートを8080とし、直接アクセスはできない設定とする
+イメージは**Dockerfile**というファイルで作成します。
+下記内容をコピーして、**myjenkins**に**Dockerfile**という名前で保存してください。
 
-* ベースイメージ2 - nginx:alpine
- * nginxのListenポートを80として、/へのアクセスをhttpd:8080へproxyする設定ファイルを追加する
- * 直接アクセスできる設定とする
+```
+FROM jenkins/jenkins:alpine
+ENV JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+COPY create-admin.groovy /usr/share/jenkins/ref/init.groovy.d/
+```
 
-* 動作確認
- * http://localhost:8080/[任意ページ] → アクセスNG
- * http://localhost/[任意ページ] → アクセスOK
+上記Dockerfileの内容の詳細は
+[Dockerfileリファレンス](http://docs.docker.jp/engine/reference/builder.html)
+を参照してください。  
+Dockerfileを作成したら、以下のコマンドでイメージを作成することができます。
+
+```
+$ docker build -t myjenkins:latest myjenkins/
+```
+
+**docker images**で**myjenkins**イメージが作成されていることを確認してください。  
+イメージからコンテナを起動する方法はこれまでと変わりません。
+以下コマンドでmyjenkinsのコンテナを起動して、[http://localhost:8080](http://localhost:8080)にアクセス、
+ID:admin/PW:adminでログインしてください。
+
+```
+$ docker run -d -p 8080:8080 myjenkins
+```
+
+</div>
+
+---
+
+### Composeの作成(1/4)
+
+Composeとは、複数のDockerコンテナを使用するDockerアプリケーションを実行するツールです。  
+ここまでで触ってきたRedmine, Jenkinsを運用して開発を行う場合、それぞれのサーバーを個別に起動・停止するのではなく、
+一括で起動・停止・状態確認等ができます。
+
+myjenkinsコンテナを停止・削除して、myjenkinsイメージを削除してください。
+
+---
+
+### Composeの作成(2/4)
+
+<div style="font-size:0.7em;">
+
+Composeは**docker-compose.yml**ファイルで管理します。  
+以下内容をコピーして、**docker-compose.yml**という名前で保存してください。
+
+```
+version: "3.7"
+services:
+  redmine:
+    image: redmine:alpine
+    ports:
+      - 3000:3000
+    volumes:
+      - redmine_data:/usr/src/redmine
+
+  myjenkins:
+    build:
+      context: ./myjenkins
+    ports:
+      - 8080:8080
+    volumes:
+      - myjenkins_data:/var/jenkins_home
+
+volumes:
+  redmine_data:
+  myjenkins_data:
+```
+
+上記docker-compose.ymlの内容の詳細は
+[Composeファイルリファレンス](http://docs.docker.jp/compose/compose-file.html)
+を参照してください。  
+
+</div>
+
+---
+
+### Composeの作成(3/4)
+
+ここまでで、以下ディレクトリ構成となっている状態です。
+
+```
+[WorkDirectory]
+ |- docker-compose.yml
+ `- myjenkins/
+     |- create-admin.groovy
+     `- Dockerfile
+```
+
+Composeは以下のコマンドで起動します。
+
+```
+$ docker-compose up -d
+```
+
+[http://localhost:8080](http://localhost:8080)でJenkins、
+[http://localhost:3000](http://localhost:3000)でRedmineが起動していることを確認してください。
+
+---
+
+### Composeの作成(4/4)
+
+<div style="font-size:0.9em;">
+
+Composeで起動したコンテナは起動時と同じくdocker-composeコマンドで停止できます。
+
+```
+$ docker-compose stop
+```
+
+サービス名を指定することで、サービス単位での起動・停止もできます。  
+以下のコマンドを実行してください。
+
+```
+$ docker-compose up -d myjenkins
+```
+
+**docker-compose ps**の実行と、
+[http://localhost:8080](http://localhost:8080)、
+[http://localhost:3000](http://localhost:3000)
+それぞれにアクセスして稼働状態を確認してください。
+
+その他、実行可能なコマンドは
+[docker-composeコマンド概要](http://docs.docker.jp/compose/reference/overview.html)
+を参照してください。
 
 </div>
 
@@ -419,7 +524,7 @@ docker-composeが実行できるコマンドは概ねdockerコマンドと同様
  * 弊社プロダクト[sit-ds](https://github.com/sitoolkit/sit-ds)もComposeで実装
  * Jenkins, Redmine, Gitbucket, Sonarqubeのアセット
  * LDAPによる認証、SelfServicePasswordによるPW管理
- * バックアップ・リストアシェルを用意
+ * バックアップ・リストアをDocker単独処理で実施
 
 ---
 
