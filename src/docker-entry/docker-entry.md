@@ -40,7 +40,7 @@ CLI操作の基礎
 
 ---
 
-### 環境の準備(1/2)
+### 環境の準備
 
 ハンズオンでは以下のソフトウェアが必要です。
 
@@ -49,24 +49,9 @@ CLI操作の基礎
    [Docker Desktop for Windows](https://docs.docker.com/docker-for-windows/install/)  
  * Mac  
    [Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/install/)  
- * Linux  
-   [Docker](https://docs.docker.com/install/linux/docker-ce/centos/)  
-   [Docker Compose](https://docs.docker.com/compose/install/)
 
 * 高機能エディタ
  * [Visual Studio Code](https://code.visualstudio.com/) 等
-
----
-
-### 環境の準備(2/2)
-
-ハンズオンではRedmine、Jenkinsを使用します。  
-CLIで以下のコマンドを実行し、Redmine、JenkinsのイメージをPULLしてください。
-
-```
-$ docker pull redmine:alpine
-$ docker pull jenkins/jenkins:alpine
-```
 
 ---
 
@@ -74,119 +59,196 @@ $ docker pull jenkins/jenkins:alpine
 
 ---
 
-### 仮想環境を動かす
+### コンテナを動かす
 
-<div style="font-size:0.9em">
+コマンドプロンプト(Windows) / ターミナル(macOS)で以下のコマンドを実行してください。
 
-環境準備に記載したコマンドで、**イメージ**と呼ばれる仮想環境のベースをインストールしました。  
-インストールしたイメージは以下のコマンドで確認できます。
-
-```
-$ docker images
+```sh
+docker run -d --name red -p 3000:3000 redmine
 ```
 
-以下のコマンドでインストールしたイメージを仮想環境として動かすことができます。
-
-```
-$ docker run -d -p 3000:3000 redmine:alpine
-```
-
-起動した仮想環境を**コンテナ**と呼びます。
-
-Redmineには[http://localhost:3000/](http://localhost:3000/)でアクセスできます。  
-ID:admin/PW:adminで管理者でログインできます。  
-Redmineにログイン、初期パスワードを変更して、任意のプロジェクトを作成してください。
-
-</div>
+コマンドが終了したら、ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセスしてください。
+Redmineのトップページが表示されることを確認します。
 
 ---
 
-### イメージとコンテナ(1/3)
+### コンテナの中に入る
 
-<div style="font-size:0.9em">
+以下のコマンドを実行してください。
 
-コンテナは以下のコマンドで確認できます。
-
-```
-$ docker ps
-```
-
-以下のコマンドでコンテナを停止できます。
-[コンテナID]には**docker ps**で表示した**CONTAINER ID**を指定します。  
-Redmineを一度停止して、再度[http://localhost:3000/](http://localhost:3000/)にアクセスしてください。
-
-```
-$ docker stop [コンテナID]
+```sh
+docker exec -it red bash
+# コンテナのOSのプロンプト
+root@3afe85b72ca6:/usr/src/redmine#
 ```
 
-停止中のコンテナは**docker ps**で表示されません。  
-停止中のコンテナも含め、すべてのコンテナを表示する場合は**-a**オプションをつけてください。
+新しいプロンプトが始まります。これはコンテナのOS(Linux)のプロンプト(bash)です。
+lsコマンドを実行すると、コンテナ内のファイルの一覧が表示されます。
 
+```sh
+ls
+# 出力
+CONTRIBUTING.md  Gemfile.lock.mysql2	  Gemfile.lock.sqlserver  app		config	   doc	  lib	   public  tmp
+Gemfile		 Gemfile.lock.postgresql  README.rdoc		  appveyor.yml	config.ru  extra  log	   sqlite  vendor
+Gemfile.lock	 Gemfile.lock.sqlite3	  Rakefile		  bin		db	   files  plugins  test
 ```
-$ docker ps -a
-```
-
-</div>
-
 ---
 
-### イメージとコンテナ(2/3)
+### コンテナとは
 
-Redmineを起動し、再度[http://localhost:3000/](http://localhost:3000/)にアクセスして、
-作成したプロジェクトを確認してください。  
-コンテナの停止ではアプリケーションの変更内容は保存されています。
+**コンテナ**とは、要するに**サーバー**です。
+**docker run**コマンドを使うと、PC内にサーバーを起動することができます。
+以下のコマンドで実行中のコンテナの一覧が確認できます。
 
-Redmineを停止してコンテナを削除します。  
-以下のコマンドを実行して下さい。
-
-```
-$ docker rm [コンテナID]
-$ docker ps -a
-```
-
-コンテナが削除され、**docker ps -a**でもコンテナが表示されなくなっています。
-
----
-
-### イメージとコンテナ(3/3)
-
-もう一度コンテナを起動して、Redmineにアクセスしてください。
-Redmineにはアクセスできますが、作成したプロジェクトは存在しません。
-
-コンテナを削除すると保存された内容もあわせて削除されます。
-イメージとはコンテナを起動するベースになるもので、
-同一のイメージから再度コンテナを起動しても、先に存在したコンテナとは別物になります。
-
-ここで、コンテナの停止・削除をしてください。
-
----
-
-### ボリューム(1/2)
-
-サーバーを運用する場合、データの永続化が必要となります。  
-Dockerではデータ永続化のためのボリュームという機能があります。  
-以下のコマンドでRedmineを起動してください。
-
-```
-$ docker run -d -p 3000:3000 -v redmine_data:/usr/src/redmine redmine:alpine
-```
-
-**-v**オプションでコンテナにボリュームと呼ばれる外部記憶領域をマウントすることができます。  
-上記コマンドの場合、redmine_dataというボリュームを作成し、コンテナの/usr/src/redmineにマウントします。  
-作成したボリュームは以下のコマンドで確認できます。
-
-```
-$ docker volume ls
+```sh
+docker ps
+# 出力
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+4c1fac037c7d        redmine             "/docker-entrypoint.…"   56 seconds ago      Up 56 seconds       0.0.0.0:3000->3000/tcp   red
 ```
 
 ---
 
-### ボリューム(2/2)
+### コンテナの停止
 
-コンテナを停止・削除してください。  
+以下のコマンドを実行してください。
 
-再度同じコマンドでコンテナを起動して、admin/変更後パスワードでログインしてください。    
-パスワードの初回変更は問われずにログインでき、作成したプロジェクトが残っています。
+```sh
+docker stop red
+```
+
+コンテナが停止して、ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセスしてもページが表示されません。
+**-a**オプションでコンテナ一覧に停止コンテナを表示することができます。
+
+```sh
+docker ps
+# 停止中のコンテナは表示されない
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+
+docker ps -a
+# 停止中含む全てのコンテナを表示
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                     PORTS               NAMES
+4c1fac037c7d        redmine             "/docker-entrypoint.…"   25 minutes ago      Exited (1) 2 minutes ago                       red
+```
+
+---
+
+### 作成済みコンテナの起動
+
+以下のコマンドを実行してください。
+
+```sh
+docker start red
+```
+
+作成済みのコンテナを起動することができます。
+
+```sh
+docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+4c1fac037c7d        redmine             "/docker-entrypoint.…"   32 minutes ago      Up 3 seconds        0.0.0.0:3000->3000/tcp   red
+```
+
+ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセスしてください。
+画面右上の**ログイン**からID:admin/PW:adminでログインして、パスワード変更してください。
+
+---
+
+### コンテナの削除
+
+以下のコマンドを実行してください。
+
+```sh
+docker stop red
+docker rm red
+```
+
+**docker rm**コマンドでコンテナが削除され、コンテナの一覧でも表示されなくなります。
+
+```sh
+docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+```
+
+---
+
+### コンテナの再作成
+
+以下のコマンドを再実行してください。
+
+```sh
+docker run -d --name red -p 3000:3000 redmine
+```
+
+ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセスして、
+画面右上のログインからID:admin/PW:adminでログインしてください。
+再度、パスワード変更を求められます。
+
+本コマンドはredmineの**イメージ**からコンテナを作成・起動するコマンドです。
+
+---
+
+### イメージとは
+
+**イメージ**とはコンテナのベースになるものです。
+コンテナの変更内容はコンテナだけに保存されて、同じイメージからコンテナを構築しても、過去に存在したコンテナとは別物になります。
+
+以下のコマンドでDockerにインストールしているイメージの一覧を表示できます。
+
+```sh
+docker images
+# 出力
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+redmine             latest              8023a425328b        6 days ago          511MB
+```
+
+---
+
+### ボリュームを作成してマウント
+
+以下のコマンドを実行してください。
+
+```sh
+docker stop red
+docker rm red
+docker run -d --name red -p 3000:3000 -v redmine_data:/usr/src/redmine redmine
+```
+
+**-v**オプションで、ボリュームをマウントすることができます。
+ボリュームが存在しない場合は自動で作成されます。
+以下コマンドで作成したボリュームを表示できます。
+
+```sh
+docker volume ls
+# 出力
+DRIVER              VOLUME NAME
+…
+local               redmine_data
+```
+
+---
+
+### 作成済みボリュームのマウント
+
+ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセス、
+画面右上のログインからID:admin/PW:adminでログインして、パスワードを変更してください。  
+パスワード変更後、以下のコマンドでコンテナ削除、作成済みのボリュームをマウントしてコンテナを再作成してください。
+
+```sh
+docker stop red
+docker rm red
+docker run -d --name red -p 3000:3000 -v redmine_data:/usr/src/redmine redmine
+```
+
+ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセスしてください。
+画面右上のログインからID:admin/PW:**変更後パスワード**でログインできます。
+
+---
+
+### ボリュームとは
+
+**ボリューム**とは、外付けHDDのような外部記憶領域です。
+ボリュームを使用することで、コンテナを削除した場合でも変更データを永続化することができます。
 
 ---
 
@@ -194,93 +256,69 @@ $ docker volume ls
 
 ---
 
-### Dockerの基本操作(1/5)
+### ログの確認
 
-ここまでに紹介した以外に、よく使用するDockerの基本操作を紹介します。
+以下のコマンドでDockerのログを表示できます。
 
-・ログの確認  
-以下のコマンドでログを確認できます。
-コマンドを実行して、Redmineにアクセスしてください。
-
-```
-$ docker logs -f [コンテナID]
+```sh
+docker logs -f red
 ```
 
-ログの停止は Ctrl+cをタイプしてください。
+ログを表示したまま、<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセスしてログの出力を確認してください。
+ログの停止は**Ctrl+c**をタイプしてください。
 
 ---
 
-### Dockerの基本操作(2/5)
+### コマンドの実行
 
-・コンテナへのコマンド実行  
-以下のコマンドでコンテナでコマンドが実行できます。
+コンテナの中に入らなくても、コンテナでコマンドを実行することができます。
+以下のコマンドを実行してください。
 
-```
-$ docker exec [コンテナID] [実行コマンド]
-```
-
-例えば、以下のコマンドを実行することで、コンテナの作業ディレクトリのファイル一覧を表示できます。
-
-```
-$ docker exec [コンテナID] ls
+```sh
+docker exec red ls
 ```
 
-コンテナのシェルにログインして作業する場合はオプションが必要になります。
+コンテナに入ってlsを実行した場合と同じファイルの一覧が表示されます。
 
+---
+
+### ファイルコピー
+
+コンテナ・ホストOSそれぞれ相互にファイルをコピーすることができます。
+以下のコマンドを実行してください。
+
+```sh
+docker cp red:/usr/src/redmine/CONTRIBUTING.md .
+# Windows
+dir CONTRIBUTING.md
+# Mac
+ls CONTRIBUTING.md
 ```
-$ docker exec -it [コンテナID] bash
--i：アタッチしていなくてもSTDINをオープンにし続ける
--t：疑似ターミナルの割り当て
+
+コンテナのCONTRIBUTING.mdをホストOSにコピーすることができます。
+
+コンテナ・ホストOSのパスを逆にすることで、ホストOSのファイルをコンテナにコピーすることもできます。
+
+```sh
+docker cp CONTRIBUTING.md red:/tmp/
+docker exec red ls /tmp
 ```
 
 ---
 
-### Dockerの基本操作(3/5)
+### ボリュームの削除
 
-・コンテナ・ホストOS間ファイルコピー  
-以下のコマンドでコンテナ・ホストOS間でファイルコピーできます。
+不要になったボリュームは削除できます。
+以下のコマンドを実行してください。
 
-```
-$ docker cp /local/file [コンテナID]:/container/path  # ホストOSのファイルをコンテナにコピー
-$ docker cp [コンテナID]:/container/file /local/path  # コンテナのファイルをホストOSにコピー
-```
-
-任意のファイルを作成し、コンテナにファイルをコピーしてください。  
-コピーができたら、コンテナにbashでログインして、ファイルがコピーされていることを確認してください。
-
----
-
-### Dockerの基本操作(4/5)
-
-・ボリュームの削除  
-コンテナを停止してください。  
-以下のコマンドでボリュームを削除できます。  
-
-```
-$ docker volume rm [ボリューム名]
+```sh
+docker stop red
+docker rm red
+docker volume rm redmine_data
+docker volume ls
 ```
 
-コンテナを停止した状態だけではボリュームの削除はできず、
-ボリュームを削除する場合はコンテナも削除する必要があります。
-
-コンテナを削除して、再度ボリューム削除コマンドを実行してください。
-
----
-
-### Dockerの基本操作(5/5)
-
-・イメージの削除  
-以下のコマンドで不要となったイメージを削除できます。
-
-```
-$ docker rmi [イメージID]
-```
-
-**※環境の準備で用意したRedmine、Jenkinsはこの後使用するため削除しないでください**
-
-その他、実行可能なコマンドは
-[Dockerコマンド](http://docs.docker.jp/engine/reference/commandline/index.html)
-を参照してください。
+**docker volume rm**でボリュームが削除され、**docker volume ls**で表示されなくなります。
 
 ---
 
@@ -288,32 +326,25 @@ $ docker rmi [イメージID]
 
 ---
 
-### コンテナの用途(1/2)
+### 仮想サーバー
 
-Dockerではコンテナをサーバーとして使用する以外に、単独処理を行うこともできます。
-
-・サーバー用  
-ここまでで触ったように、通常のサーバーのように仮想環境でアプリケーションサーバを運用することができます。  
-Redmine以外にも様々なイメージが[DockerHub](https://hub.docker.com/)に用意されています。
+ここまでで触ってきたようにコンテナをサーバーとして運用することができます。  
+コンテナを削除すると保存したデータも削除されますが、ボリュームを使用することでデータを永続化できます。
 
 ---
 
-### コンテナの用途(2/2)
+### 単独処理
 
-・単独処理用  
-docker runで**--rm**オプションを指定すると、コンテナ終了時にコンテナを自動的に削除することができます。
-このオプションを利用することで、サーバーとしてではなく、コンテナを使用して単独処理を行うことができます。
+以下のコマンドを実行してください。
 
-例）ボリュームのバックアップ  
-(弊社プロダクト[sit-ds](https://github.com/sitoolkit/sit-ds)で使用)
-
+```sh
+docker run --rm redmine ls
+docker ps -a
 ```
-docker run --rm \                                     # --rmオプションを指定してコンテナ起動
-  -v ${volume_name}:/target \                         # バックアップするボリュームをコンテナ：/targetにマウント
-  -v ${LOCAL_BACKUP_DIR}:/backup \                    # ホストOSのバックアップ先ディレクトリをコンテナ：/backupにマウント
-  ubuntu \                                            # ubuntuイメージを使用
-  tar cfz /backup/${volume_name}.tar.gz -C /target .  # tarコマンドで/targetディレクトリを/backupにバックアップ
-```
+
+**docker exec red ls**と同様、redmineのファイルが表示されますが、コンテナ一覧にコンテナは存在しません。
+dokcer runに**--rm**オプションを追加すると、コンテナ終了時にコンテナを削除することができます。
+このオプションを利用することで、サーバーとしての用途ではなく、単独の処理が可能です。
 
 ---
 
@@ -321,89 +352,77 @@ docker run --rm \                                     # --rmオプションを�
 
 ---
 
-### イメージの作成(1/3)
+### イメージの作成
 
-以下のコマンドでJenkinsを起動してください。
+Dockerは独自のイメージを作成することができます。
+Redmine-PostgreSQL連携環境の構築を通してイメージの作成方法を理解します。
 
-```
-$ docker run -d -p 8080:8080 jenkins/jenkins:alpine
-```
-
-起動後、[http://localhost:8080](http://localhost:8080)にアクセスしてください。  
-Jenkinsの初期設定が始まります。
-
-様々なプロジェクトで開発用サーバーを運用する場合、構築の都度初期設定するのは作業コストがかかります。  
-そこで、管理者ユーザ作成済み、初期設定をスキップするカスタマイズイメージを作成します。
-
-初期設定画面を閉じて、Jenkinsのコンテナ停止・削除してください。
+1. Redmine用初期化済みPostgreSQLイメージを作成
+1. DBにPostgreSQLを使用する設定のRedmineイメージを作成
 
 ---
 
-### イメージの作成(2/3)
+### カスタムPostgreSQLイメージの作成
 
-<div style="font-size:0.8em;">
-
-イメージ作成用ファイルをまとめて管理するため、**myjenkins**ディレクトリを作成してください。
-
-Jenkinsの初期設定スクリプトを用意します。
-下記内容をコピーして、**myjenkins**に**create-admin.groovy**という名前で保存してください。
-
+1. redpostgresディレクトリを作成
+1. redpostgresディレクトリに<a href="./redpostgres/init-redmine.sql">init-redmine.sql</a>(Redmine用初期化SQLファイル)を作成  
+参考：http://guide.redmine.jp/RedmineInstall/#step-2-
+1. redpostgresディレクトリに以下内容のDockerfileを作成
+```docker
+FROM postgres
+ADD init-redmine.sql /docker-entrypoint-initdb.d 
 ```
-import jenkins.model.*
-import hudson.security.*
-
-def adminUsername = "admin"
-def adminPassword = "admin"
-
-def instance = Jenkins.getInstance()
-
-def hudsonRealm = new HudsonPrivateSecurityRealm(false)
-hudsonRealm.createAccount(adminUsername, adminPassword)
-instance.setSecurityRealm(hudsonRealm)
-
-def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
-strategy.setAllowAnonymousRead(false)
-instance.setAuthorizationStrategy(strategy)
-
-instance.save()
+1. 以下コマンドを実行
+```sh
+docker build -t redpostgres redpostgres/
+docker images
+# 出力
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+redpostgres         latest              0ed2592243c1        11 minutes ago      348MB
 ```
-
-</div>
 
 ---
 
-### イメージの作成(3/3)
+### カスタムRedmineイメージの作成
 
-<div style="font-size:0.8em;">
-
-イメージは**Dockerfile**というファイルで作成します。
-下記内容をコピーして、**myjenkins**に**Dockerfile**という名前で保存してください。
-
+1. redディレクトリを作成
+1. redディレクトリに<a href="./red/database.yml">database.yml</a>(PostgreSQL接続設定ファイル)を作成  
+参考：http://guide.redmine.jp/RedmineInstall/#step-3-
+1. redディレクトリに以下内容のDockerfileを作成
+```docker
+FROM redmine
+ADD database.yml /usr/src/redmine/config
 ```
-FROM jenkins/jenkins:alpine
-ENV JAVA_OPTS=-Djenkins.install.runSetupWizard=false
-COPY create-admin.groovy /usr/share/jenkins/ref/init.groovy.d/
-```
-
-上記Dockerfileの内容の詳細は
-[Dockerfileリファレンス](http://docs.docker.jp/engine/reference/builder.html)
-を参照してください。  
-Dockerfileを作成したら、以下のコマンドでイメージを作成することができます。
-
-```
-$ docker build -t myjenkins:latest myjenkins/
+1. 以下コマンドを実行
+```sh
+docker build -t red red/
+docker images
+# 出力
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+red                 latest              21d9ee9e836b        17 seconds ago      511MB
 ```
 
-**docker images**で**myjenkins**イメージが作成されていることを確認してください。  
-イメージからコンテナを起動する方法はこれまでと変わりません。
-以下コマンドでmyjenkinsのコンテナを起動して、[http://localhost:8080](http://localhost:8080)にアクセス、
-ID:admin/PW:adminでログインしてください。
+---
 
-```
-$ docker run -d -p 8080:8080 myjenkins
+### 連携環境の起動
+
+以下のコマンドを実行すると、連携環境が起動できます。
+
+```sh
+# postgresの起動
+docker run -d --name redpostgres redpostgres
+# redmineの起動
+docker run -d --name red --link redpostgres:redpostgres -p 3000:3000 red
 ```
 
-</div>
+起動後、ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセス、
+画面右上のログインからID:admin/PW:adminでログインして、パスワードを変更してください。  
+パスワード変更後、<a href="http://localhost:3000/admin/info">http://localhost:3000/admin/info</a>にアクセスして、
+**Database adapter**が**PostgreSQL**となっていることを確認してください。(デフォルトはSQLite)
+
+---
+
+# OLD
 
 ---
 
@@ -525,6 +544,18 @@ $ docker-compose up -d myjenkins
  * Jenkins, Redmine, Gitbucket, Sonarqubeのアセット
  * LDAPによる認証、SelfServicePasswordによるPW管理
  * バックアップ・リストアをDocker単独処理で実施
+
+---
+
+### 付録：各種リファレンスへのリンク
+
+<a href="http://docs.docker.jp/engine/reference/commandline/index.html">Dockerコマンド</a>
+
+<a href="http://docs.docker.jp/engine/reference/builder.html">Dockerfileリファレンス</a>
+
+<a href="http://docs.docker.jp/compose/compose-file.html">Composeファイル・リファレンス</a>
+
+<a href="http://docs.docker.jp/compose/reference/overview.html">docker-composeコマンド概要</a>
 
 ---
 
