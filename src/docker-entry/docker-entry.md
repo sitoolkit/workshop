@@ -160,6 +160,7 @@ docker start red
 
 ```sh
 docker ps
+# 出力
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
 4c1fac037c7d        redmine             "/docker-entrypoint.…"   32 minutes ago      Up 3 seconds        0.0.0.0:3000->3000/tcp   red
 ```
@@ -404,7 +405,7 @@ docker run -d --name red --link psql:psql -p 3000:3000 red
 
 ### Composeとは
 
-Redmine-PostgreSQL連携環境を構築しましたが、dockerコマンドではそれぞれ別で起動する必要があります。
+Redmine-PostgreSQL連携環境を構築しましたが、dockerコマンドではそれぞれ個別に起動する必要があります。
 **Compose**を使用すると、Redmine,PostgreSQLコンテナを一括で管理することができます。
 Redmine-PostgreSQL連携環境をComposeで構築します。
 
@@ -423,7 +424,7 @@ docker rmi red
 <div style="font-size:0.7em;">
 
 Composeは**docker-compose.yml**ファイルで管理します。  
-以下内容をコピーして、**docker-compose.yml**という名前で保存してください。
+以下内容をコピーして、<a href="./docker-compose.yml">**docker-compose.yml**</a>という名前で保存してください。
 
 ```yml
 version: "3.7"
