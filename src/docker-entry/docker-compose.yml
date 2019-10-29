@@ -1,0 +1,20 @@
+version: "3.7"
+services:
+  red:
+    build:
+      context: ./red
+    ports:
+      - 3000:3000
+    volumes:
+      - redmine_data:/usr/src/redmine
+    depends_on:
+      - psql
+
+  psql:
+    image: postgres
+    volumes: 
+      - psql_data:/var/lib/postgresql/data
+
+volumes:
+  redmine_data:
+  psql_data:

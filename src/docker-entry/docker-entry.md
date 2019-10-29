@@ -13,9 +13,6 @@ title: Docker入門ハンズオン
 - はじめに
 - 環境の準備
 - Dockerの構成要素
- - 仮想環境を動かす
- - イメージとコンテナ
- - ボリューム
 - Dockerの基本操作
 - コンテナの用途
 - イメージ・composeの作成
@@ -32,7 +29,7 @@ Dockerアプリケーションの作成方法まで、ハンズオン形式で�
 
 **前提知識**
 
-CLI操作の基礎
+Windows 又は MacでCLI操作ができること
 
 ---
 
@@ -107,7 +104,25 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 4c1fac037c7d        redmine             "/docker-entrypoint.…"   56 seconds ago      Up 56 seconds       0.0.0.0:3000->3000/tcp   red
 ```
 
+
 ---
+
+### イメージとは
+
+コンテナは**イメージ**から作成されます。
+コンテナをサーバーとすると、OS、又はOS+アプリケーションのアセットです。
+以下のコマンドでDockerにインストールしているイメージの一覧を表示できます。
+
+```sh
+docker images
+# 出力
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+redmine             latest              8023a425328b        7 days ago          511MB
+postgres            latest              f88dfa384cc4        12 days ago         348MB
+```
+
+---
+
 
 ### コンテナの停止
 
@@ -149,14 +164,14 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 4c1fac037c7d        redmine             "/docker-entrypoint.…"   32 minutes ago      Up 3 seconds        0.0.0.0:3000->3000/tcp   red
 ```
 
+---
+
+### コンテナの削除(1/2)
+
 ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセスしてください。
 画面右上の**ログイン**からID:admin/PW:adminでログインして、パスワード変更してください。
 
----
-
-### コンテナの削除
-
-以下のコマンドを実行してください。
+パスワード変更が完了したら、以下のコマンドを実行してください。
 
 ```sh
 docker stop red
@@ -167,14 +182,15 @@ docker rm red
 
 ```sh
 docker ps -a
+# 出力
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 ```
 
 ---
 
-### コンテナの再作成
+### コンテナの削除(2/2)
 
-以下のコマンドを再実行してください。
+以下のコマンドを再実行して、コンテナを作成します。
 
 ```sh
 docker run -d --name red -p 3000:3000 redmine
@@ -183,29 +199,13 @@ docker run -d --name red -p 3000:3000 redmine
 ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセスして、
 画面右上のログインからID:admin/PW:adminでログインしてください。
 再度、パスワード変更を求められます。
-
-本コマンドはredmineの**イメージ**からコンテナを作成・起動するコマンドです。
-
----
-
-### イメージとは
-
-**イメージ**とはコンテナのベースになるものです。
-コンテナの変更内容はコンテナだけに保存されて、同じイメージからコンテナを構築しても、過去に存在したコンテナとは別物になります。
-
-以下のコマンドでDockerにインストールしているイメージの一覧を表示できます。
-
-```sh
-docker images
-# 出力
-REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-redmine             latest              8023a425328b        6 days ago          511MB
-```
+コンテナを削除したことによって、コンテナに保存されたデータも削除されます。
 
 ---
 
-### ボリュームを作成してマウント
+### ボリュームのマウント(1/2)
 
+コンテナを運用するため、**ボリューム**を使用してデータを永続化します。
 以下のコマンドを実行してください。
 
 ```sh
@@ -228,7 +228,7 @@ local               redmine_data
 
 ---
 
-### 作成済みボリュームのマウント
+### ボリュームのマウント(2/2)
 
 ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセス、
 画面右上のログインからID:admin/PW:adminでログインして、パスワードを変更してください。  
@@ -247,8 +247,9 @@ docker run -d --name red -p 3000:3000 -v redmine_data:/usr/src/redmine redmine
 
 ### ボリュームとは
 
-**ボリューム**とは、外付けHDDのような外部記憶領域です。
-ボリュームを使用することで、コンテナを削除した場合でも変更データを永続化することができます。
+コンテナに**ボリューム**をマウントすることで、マウントしたディレクトリのデータを保存できます。
+コンテナをサーバーとするとボリュームはHDDのようなものです。
+コンテナ作成時にマウントすることで、コンテナの作業データをボリュームに保存、使用することができます。
 
 ---
 
@@ -326,7 +327,7 @@ docker volume ls
 
 ---
 
-### 仮想サーバー
+### サーバー
 
 ここまでで触ってきたようにコンテナをサーバーとして運用することができます。  
 コンテナを削除すると保存したデータも削除されますが、ボリュームを使用することでデータを永続化できます。
@@ -344,7 +345,7 @@ docker ps -a
 
 **docker exec red ls**と同様、redmineのファイルが表示されますが、コンテナ一覧にコンテナは存在しません。
 dokcer runに**--rm**オプションを追加すると、コンテナ終了時にコンテナを削除することができます。
-このオプションを利用することで、サーバーとしての用途ではなく、単独の処理が可能です。
+このオプションを利用することで、コンテナ単独での処理が可能です。
 
 ---
 
@@ -357,29 +358,8 @@ dokcer runに**--rm**オプションを追加すると、コンテナ終了時�
 Dockerは独自のイメージを作成することができます。
 Redmine-PostgreSQL連携環境の構築を通してイメージの作成方法を理解します。
 
-1. Redmine用初期化済みPostgreSQLイメージを作成
-1. DBにPostgreSQLを使用する設定のRedmineイメージを作成
-
----
-
-### カスタムPostgreSQLイメージの作成
-
-1. redpostgresディレクトリを作成
-1. redpostgresディレクトリに<a href="./redpostgres/init-redmine.sql">init-redmine.sql</a>(Redmine用初期化SQLファイル)を作成  
-参考：http://guide.redmine.jp/RedmineInstall/#step-2-
-1. redpostgresディレクトリに以下内容のDockerfileを作成
-```docker
-FROM postgres
-ADD init-redmine.sql /docker-entrypoint-initdb.d 
-```
-1. 以下コマンドを実行
-```sh
-docker build -t redpostgres redpostgres/
-docker images
-# 出力
-REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-redpostgres         latest              0ed2592243c1        11 minutes ago      348MB
-```
+1. PostgreSQLを使用する設定のRedmineイメージを作成
+1. Redmine-PostgreSQL連携環境を起動
 
 ---
 
@@ -388,12 +368,12 @@ redpostgres         latest              0ed2592243c1        11 minutes ago      
 1. redディレクトリを作成
 1. redディレクトリに<a href="./red/database.yml">database.yml</a>(PostgreSQL接続設定ファイル)を作成  
 参考：http://guide.redmine.jp/RedmineInstall/#step-3-
-1. redディレクトリに以下内容のDockerfileを作成
+1. redディレクトリに以下内容の**Dockerfile**を作成
 ```docker
 FROM redmine
 ADD database.yml /usr/src/redmine/config
 ```
-1. 以下コマンドを実行
+1. 以下コマンドを実行してイメージを作成
 ```sh
 docker build -t red red/
 docker images
@@ -410,9 +390,9 @@ red                 latest              21d9ee9e836b        17 seconds ago      
 
 ```sh
 # postgresの起動
-docker run -d --name redpostgres redpostgres
+docker run -d --name psql postgres
 # redmineの起動
-docker run -d --name red --link redpostgres:redpostgres -p 3000:3000 red
+docker run -d --name red --link psql:psql -p 3000:3000 red
 ```
 
 起動後、ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセス、
@@ -422,108 +402,143 @@ docker run -d --name red --link redpostgres:redpostgres -p 3000:3000 red
 
 ---
 
-# OLD
+### Composeとは
+
+Redmine-PostgreSQL連携環境を構築しましたが、dockerコマンドではそれぞれ別で起動する必要があります。
+**Compose**を使用すると、Redmine,PostgreSQLコンテナを一括で管理することができます。
+Redmine-PostgreSQL連携環境をComposeで構築します。
+
+以下コマンドでRedmine, PostgreSQLのコンテナと、カスタムRedmineイメージを削除してください。
+
+```sh
+docker stop psql red
+docker rm psql red
+docker rmi red
+```
 
 ---
 
-### Composeの作成(1/4)
-
-Composeとは、複数のDockerコンテナを使用するDockerアプリケーションを実行するツールです。  
-ここまでで触ってきたRedmine, Jenkinsを運用して開発を行う場合、それぞれのサーバーを個別に起動・停止するのではなく、
-一括で起動・停止・状態確認等ができます。
-
-myjenkinsコンテナを停止・削除して、myjenkinsイメージを削除してください。
-
----
-
-### Composeの作成(2/4)
+### Composeの作成(1/2)
 
 <div style="font-size:0.7em;">
 
 Composeは**docker-compose.yml**ファイルで管理します。  
 以下内容をコピーして、**docker-compose.yml**という名前で保存してください。
 
-```
+```yml
 version: "3.7"
 services:
-  redmine:
-    image: redmine:alpine
+  red:
+    build:
+      context: ./red
     ports:
       - 3000:3000
     volumes:
       - redmine_data:/usr/src/redmine
+    depends_on:
+      - psql
 
-  myjenkins:
-    build:
-      context: ./myjenkins
-    ports:
-      - 8080:8080
-    volumes:
-      - myjenkins_data:/var/jenkins_home
+  psql:
+    image: postgres
+    volumes: 
+      - psql_data:/var/lib/postgresql/data
 
 volumes:
   redmine_data:
-  myjenkins_data:
+  psql_data:
 ```
-
-上記docker-compose.ymlの内容の詳細は
-[Composeファイルリファレンス](http://docs.docker.jp/compose/compose-file.html)
-を参照してください。  
 
 </div>
 
 ---
 
-### Composeの作成(3/4)
+### Composeの作成(2/2)
 
 ここまでで、以下ディレクトリ構成となっている状態です。
 
-```
+```sh
 [WorkDirectory]
  |- docker-compose.yml
- `- myjenkins/
-     |- create-admin.groovy
+ `- red/
+     |- database.yml
      `- Dockerfile
 ```
 
-Composeは以下のコマンドで起動します。
+---
 
-```
-$ docker-compose up -d
+### Composeの起動
+
+以下のコマンドでComposeの起動ができます。
+
+```sh
+docker-compose up -d
 ```
 
-[http://localhost:8080](http://localhost:8080)でJenkins、
-[http://localhost:3000](http://localhost:3000)でRedmineが起動していることを確認してください。
+起動後、ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセス、
+画面右上のログインからID:admin/PW:adminでログインして、パスワードを変更してください。  
+パスワード変更後、<a href="http://localhost:3000/admin/info">http://localhost:3000/admin/info</a>にアクセスして、
+**Database adapter**が**PostgreSQL**となっていることを確認してください。(デフォルトはSQLite)
 
 ---
 
-### Composeの作成(4/4)
+### Composeのコンテナ確認
 
-<div style="font-size:0.9em;">
+以下のコマンドでdocker-compose.ymlで管理しているコンテナが確認できます。
 
-Composeで起動したコンテナは起動時と同じくdocker-composeコマンドで停止できます。
-
-```
-$ docker-compose stop
-```
-
-サービス名を指定することで、サービス単位での起動・停止もできます。  
-以下のコマンドを実行してください。
-
-```
-$ docker-compose up -d myjenkins
+```sh
+docker-compose ps
+# 出力
+    Name                   Command               State           Ports
+-------------------------------------------------------------------------------
+docker_psql_1   docker-entrypoint.sh postgres    Up      5432/tcp
+docker_red_1    /docker-entrypoint.sh rail ...   Up      0.0.0.0:3000->3000/tcp
 ```
 
-**docker-compose ps**の実行と、
-[http://localhost:8080](http://localhost:8080)、
-[http://localhost:3000](http://localhost:3000)
-それぞれにアクセスして稼働状態を確認してください。
+---
 
-その他、実行可能なコマンドは
-[docker-composeコマンド概要](http://docs.docker.jp/compose/reference/overview.html)
-を参照してください。
+### Composeの停止
 
-</div>
+以下のコマンドでComposeを停止できます。
+docker-compose psでは、オプション無しで停止中のコンテナを表示できます。
+
+```sh
+docker-compose stop
+docker-compose ps
+# 出力
+    Name                   Command               State    Ports
+---------------------------------------------------------------
+docker_psql_1   docker-entrypoint.sh postgres    Exit 0
+docker_red_1    /docker-entrypoint.sh rail ...   Exit 1
+```
+
+---
+
+### 作成済みComposeの起動
+
+以下のコマンドで作成済みComposeの起動ができます。
+
+```sh
+docker-compose start
+docker-compose ps
+# 出力
+    Name                   Command               State           Ports
+-------------------------------------------------------------------------------
+docker_psql_1   docker-entrypoint.sh postgres    Up      5432/tcp
+docker_red_1    /docker-entrypoint.sh rail ...   Up      0.0.0.0:3000->3000/tcp
+```
+
+---
+
+### Composeのログ確認
+
+Composeのログ確認は、全コンテナのログの一括確認、コンテナ単位の確認ができます。
+
+```
+# 全コンテナのログを表示
+docker-compose logs -f
+# redmineのログを表示
+dokcer-compose logs -f red
+```
 
 ---
 
@@ -533,17 +548,18 @@ $ docker-compose up -d myjenkins
 
 ### まとめ
 
-* Dockerとはイメージからコンテナを起動する仮想環境プラットフォーム  
-ボリュームを使用してデータの永続化が可能
-* 単独処理/サーバー
- * オプションの指定で、単独処理の実行後にコンテナ自動削除
- * 永続化によりアプリケーションサーバーの提供が可能
-* Dockerfileによる独自イメージの作成が可能
-* Composeによる複数コンテナが連携するDockerアプリケーションの作成が可能
+* Dockerとは
+ * イメージからコンテナを作成してサーバーの運用ができる
+ * コンテナにボリュームをマウントすることで、データの永続化が可能
+* コンテナでできること
+ * サーバーとして運用可能
+ * オプションの指定で単独処理が可能
+* Dockerfileを用意することで独自のイメージを作成できる
+* Composeにより、複数コンテナが連携するDockerアプリケーションを作成できる
  * 弊社プロダクト[sit-ds](https://github.com/sitoolkit/sit-ds)もComposeで実装
  * Jenkins, Redmine, Gitbucket, Sonarqubeのアセット
- * LDAPによる認証、SelfServicePasswordによるPW管理
- * バックアップ・リストアをDocker単独処理で実施
+ * 各種アプリケーションサーバーはLDAP認証 + SelfServicePasswordでPW一括管理
+ * バックアップ・リストアをDocker単独処理で実現
 
 ---
 
