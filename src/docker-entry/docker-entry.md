@@ -104,47 +104,101 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 4c1fac037c7d        redmine             "/docker-entrypoint.…"   56 seconds ago      Up 56 seconds       0.0.0.0:3000->3000/tcp   red
 ```
 
+---
+
+### イメージの作成
+
+Redmineコンテナは既存のイメージから起動しましたが、イメージは自作することができます。
+**alp-jdk11**ディレクトリを作成し、以下内容をコピーしてalp-jdk11ディレクトリに
+<a href="./alp-jdk11/Dockerfile">**Dockerfile**</a>というファイル名で保存してください。
+
+```docker
+FROM alpine
+RUN apk update \
+  && apk add openjdk11-jdk \
+  && rm -rf /var/cache/apk/*
+ENTRYPOINT ["tail", "-f", "/dev/null"]
+```
+
+Dockerfileを作成したら、以下のコマンドを実行してください。
+
+```sh
+docker build -t alp-jdk11 alp-jdk11/
+```
+
+これで、**Java11インストール済みAlpineLinux**のイメージが作成できました。
+
+---
+
+### イメージからコンテナを起動
+
+以下のコマンドでコンテナを起動、コンテナに入ってください。
+
+```sh
+docker run -d --name alp-jdk11 alp-jdk11
+docker exec -it alp-jdk11 sh
+```
+
+コンテナのプロンプトで以下のコマンドを実行してください。
+
+```sh
+cat /etc/os-release
+java -version
+```
+
+**Java11インストール済みAlpineLinux**のコンテナが起動していることが確認できます。
 
 ---
 
 ### イメージとは
 
-コンテナは**イメージ**から作成されます。
-コンテナをサーバーとすると、OS、又はOS+アプリケーションのアセットです。
+コンテナを起動したサーバーとすると、**イメージ**は**サーバーを構築するためのインストールディスク**のようなものです。
+起動したいOS・アプリケーションを**Dockerfile**に記述して**docker build**コマンドでイメージを作成します。
+作成したイメージからコンテナを起動することで、サーバーを運用することができます。
 以下のコマンドでDockerにインストールしているイメージの一覧を表示できます。
 
 ```sh
 docker images
 # 出力
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-redmine             latest              8023a425328b        7 days ago          511MB
-postgres            latest              f88dfa384cc4        12 days ago         348MB
+alp-jdk11           latest              4f50dd900ea4        32 seconds ago      186MB
+alpine              latest              965ea09ff2eb        8 days ago          5.55MB
+redmine             latest              8023a425328b        8 days ago          511MB
+postgres            latest              f88dfa384cc4        13 days ago         348MB
 ```
 
 ---
 
-
 ### コンテナの停止
+
+<div style="font-size:0.8em;">
 
 以下のコマンドを実行してください。
 
 ```sh
-docker stop red
+docker stop alp-jdk11
+docker exec -it alp-jdk11 sh
+# 出力
+Error response from daemon: Container [ContainerID] is not running
 ```
 
-コンテナが停止して、ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセスしてもページが表示されません。
+コンテナが停止して、コンテナのシェルにログインできなくなります。
 **-a**オプションでコンテナ一覧に停止コンテナを表示することができます。
 
 ```sh
 docker ps
 # 停止中のコンテナは表示されない
-CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                    NAMES
+fd981bfb6e91        redmine             "/docker-entrypoint.…"   About a minute ago   Up About a minute   0.0.0.0:3000->3000/tcp   red
 
 docker ps -a
 # 停止中含む全てのコンテナを表示
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                     PORTS               NAMES
-4c1fac037c7d        redmine             "/docker-entrypoint.…"   25 minutes ago      Exited (1) 2 minutes ago                       red
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS                        PORTS                    NAMES
+daff9cb3c91c        alp-jdk11           "tail -f /dev/null"      53 seconds ago       Exited (137) 19 seconds ago                            alp-jdk11
+fd981bfb6e91        redmine             "/docker-entrypoint.…"   About a minute ago   Up About a minute             0.0.0.0:3000->3000/tcp   red
 ```
+
+</div>
 
 ---
 
@@ -153,30 +207,40 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 以下のコマンドを実行してください。
 
 ```sh
-docker start red
+docker start alp-jdk11
 ```
 
 作成済みのコンテナを起動することができます。
 
 ```sh
 docker ps
-# 出力
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-4c1fac037c7d        redmine             "/docker-entrypoint.…"   32 minutes ago      Up 3 seconds        0.0.0.0:3000->3000/tcp   red
+daff9cb3c91c        alp-jdk11           "tail -f /dev/null"      3 minutes ago       Up 4 seconds                                 alp-jdk11
+fd981bfb6e91        redmine             "/docker-entrypoint.…"   4 minutes ago       Up 4 minutes        0.0.0.0:3000->3000/tcp   red
 ```
 
 ---
 
 ### コンテナの削除(1/2)
 
-ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセスしてください。
-画面右上の**ログイン**からID:admin/PW:adminでログインして、パスワード変更してください。
+<div style="font-size:0.8em;">
 
-パスワード変更が完了したら、以下のコマンドを実行してください。
+以下コマンドでalp-jdk11にファイルを作成します。
 
 ```sh
-docker stop red
-docker rm red
+docker exec -it alp-jdk11 sh
+# コンテナのプロンプトで
+echo "docker entry" > /mnt/entry.txt
+ls /mnt/entry.txt
+# 出力
+/mnt/entry.txt
+```
+
+コマンド終了後、コンテナを出て以下のコマンドを実行してください。
+
+```sh
+docker stop alp-jdk11
+docker rm alp-jdk11
 ```
 
 **docker rm**コマンドでコンテナが削除され、コンテナの一覧でも表示されなくなります。
@@ -184,73 +248,101 @@ docker rm red
 ```sh
 docker ps -a
 # 出力
-CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+fd981bfb6e91        redmine             "/docker-entrypoint.…"   5 minutes ago       Up 5 minutes        0.0.0.0:3000->3000/tcp   red
 ```
+
+</div>
 
 ---
 
 ### コンテナの削除(2/2)
 
-以下のコマンドを再実行して、コンテナを作成します。
+以下のコマンドを再実行してコンテナを作成て、コンテナに入ります。
 
 ```sh
-docker run -d --name red -p 3000:3000 redmine
+docker run -d --name alp-jdk11 alp-jdk11
+docker exec -it alp-jdk11 sh
 ```
 
-ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセスして、
-画面右上のログインからID:admin/PW:adminでログインしてください。
-再度、パスワード変更を求められます。
+コンテナのプロンプトで以下のコマンドを実行すると、コンテナを削除する前に作成したファイルが存在しません。
+
+```sh
+ls /mnt/entry.txt
+```
+
 コンテナを削除したことによって、コンテナに保存されたデータも削除されます。
 
 ---
 
-### ボリュームのマウント(1/2)
+### ボリュームのマウント(1/3)
 
 コンテナを運用するため、**ボリューム**を使用してデータを永続化します。
 以下のコマンドを実行してください。
 
 ```sh
-docker stop red
-docker rm red
-docker run -d --name red -p 3000:3000 -v redmine_data:/usr/src/redmine redmine
+docker stop alp-jdk11
+docker rm alp-jdk11
+docker run -d --name alp-jdk11 -v alp_data:/mnt alp-jdk11
 ```
 
 **-v**オプションで、ボリュームをマウントすることができます。
 ボリュームが存在しない場合は自動で作成されます。
-以下コマンドで作成したボリュームを表示できます。
+
+---
+
+### ボリュームのマウント(2/3)
+
+以下コマンドでボリュームをマウントしたディレクトリにファイルを作成します。
 
 ```sh
-docker volume ls
+docker exec -it alp-jdk11 sh
+# コンテナのプロンプトで
+echo "docker entry" > /mnt/entry.txt
+ls /mnt/entry.txt
 # 出力
-DRIVER              VOLUME NAME
-…
-local               redmine_data
+/mnt/entry.txt
+```
+
+ファイルを作成したら、コンテナを出てコンテナを削除してください。
+
+```sh
+docker stop alp-jdk11
+docker rm alp-jdk11
 ```
 
 ---
 
-### ボリュームのマウント(2/2)
+### ボリュームのマウント(3/3)
 
-ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセス、
-画面右上のログインからID:admin/PW:adminでログインして、パスワードを変更してください。  
-パスワード変更後、以下のコマンドでコンテナ削除、作成済みのボリュームをマウントしてコンテナを再作成してください。
+
+以下のコマンドでコンテナを再作成、作成ファイルを確認してください。
 
 ```sh
-docker stop red
-docker rm red
-docker run -d --name red -p 3000:3000 -v redmine_data:/usr/src/redmine redmine
+docker run -d --name alp-jdk11 -v alp_data:/mnt alp-jdk11
+docker exec -it alp-jdk11 sh
+# コンテナのプロンプトで
+ls /mnt/entry.txt
 ```
 
-ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセスしてください。
-画面右上のログインからID:admin/PW:**変更後パスワード**でログインできます。
+コンテナが削除されても、ボリュームに保存されたデータは削除されません。
+データが保存されたボリュームをマウントすることで、保存されたデータを参照することができます。
 
 ---
 
 ### ボリュームとは
 
 コンテナに**ボリューム**をマウントすることで、マウントしたディレクトリのデータを保存できます。
-コンテナをサーバーとするとボリュームはHDDのようなものです。
+コンテナをサーバーとするとボリュームは**HDDやSSDのような記憶装置**の役割を果たします。
 コンテナ作成時にマウントすることで、コンテナの作業データをボリュームに保存、使用することができます。
+以下コマンドで作成したボリュームを表示できます。
+
+```sh
+docker volume ls
+# 出力
+DRIVER              VOLUME NAME
+local               alp_data
+```
 
 ---
 
@@ -314,9 +406,9 @@ docker exec red ls /tmp
 以下のコマンドを実行してください。
 
 ```sh
-docker stop red
-docker rm red
-docker volume rm redmine_data
+docker stop alp-jdk11
+docker rm alp-jdk11
+docker volume rm alp_data
 docker volume ls
 ```
 
@@ -361,6 +453,13 @@ Redmine-PostgreSQL連携環境の構築を通してイメージの作成方法�
 
 1. PostgreSQLを使用する設定のRedmineイメージを作成
 1. Redmine-PostgreSQL連携環境を起動
+
+作成の前に、ここまでで使用したRedmineを停止、削除してください。
+
+```sh
+docker stop red
+docker rm red
+```
 
 ---
 
@@ -549,9 +648,9 @@ dokcer-compose logs -f red
 
 ### まとめ
 
-* Dockerとは
- * イメージからコンテナを作成してサーバーの運用ができる
- * コンテナにボリュームをマウントすることで、データの永続化が可能
+* Dockerの構成要素
+ * イメージからコンテナを構築してサーバーとして運用
+ * コンテナにボリュームをマウントすることでデータを永続化
 * コンテナでできること
  * サーバーとして運用可能
  * オプションの指定で単独処理が可能
