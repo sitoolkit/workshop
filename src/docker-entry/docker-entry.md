@@ -47,8 +47,7 @@ Windows 又は MacでCLI操作ができること
  * Mac  
    [Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/install/)  
 
-* 高機能エディタ
- * [Visual Studio Code](https://code.visualstudio.com/) 等
+* [Visual Studio Code](https://code.visualstudio.com/)
 
 ---
 
@@ -101,248 +100,168 @@ Gemfile.lock	 Gemfile.lock.sqlite3	  Rakefile		  bin		db	   files  plugins  test
 docker ps
 # 出力
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-4c1fac037c7d        redmine             "/docker-entrypoint.…"   56 seconds ago      Up 56 seconds       0.0.0.0:3000->3000/tcp   red
+f4a5f3fe4fa1        redmine             "/docker-entrypoint.…"   20 seconds ago      Up 19 seconds       0.0.0.0:3000->3000/tcp   red
 ```
 
 ---
 
-### イメージの作成
+### イメージの作成(1/3)
 
-Redmineコンテナは既存のイメージから起動しましたが、イメージは自作することができます。
-**alp-jdk11**ディレクトリを作成し、以下内容をコピーしてalp-jdk11ディレクトリに
-<a href="./alp-jdk11/Dockerfile">**Dockerfile**</a>というファイル名で保存してください。
+前述の**docker run**コマンドは<a href="https://hub.docker.com/_/redmine">Docker Hub</a>
+で公開されているRedmineの**Dockerイメージ**でコンテナを起動しています。
 
+**Dockerイメージ**は公開されているイメージをカスタマイズして作ることもできます。
+
+以下のコマンドを実行し、mywebserverディレクトリとDockerfile、docker-entry.htmlファイルを作成してください。
+
+```sh
+mkdir mywebserver
+cd mywebserver
+code Dockerfile
+code docker-entry.html
+```
+
+---
+
+### イメージの作成 (2/3)
+
+VSCodeがDockerfile、docker-entry.htmlを開いたら以下の内容を貼り付けてください。
+
+・Dockerfile
 ```docker
-FROM alpine
-RUN apk update \
-  && apk add openjdk11-jdk \
-  && rm -rf /var/cache/apk/*
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+FROM nginx
+ADD docker-entry.html /usr/share/nginx/html
 ```
 
-Dockerfileを作成したら、以下のコマンドを実行してください。
-
-```sh
-docker build -t alp-jdk11 alp-jdk11/
+・docker-entry.html
+```html
+<html><body><h1>WebServer working by docker</h1></body></html>
 ```
-
-これで、**Java11インストール済みAlpineLinux**のイメージが作成できました。
 
 ---
 
-### イメージからコンテナを起動
+### イメージの作成 (3/3)
 
-以下のコマンドでコンテナを起動、コンテナに入ってください。
-
-```sh
-docker run -d --name alp-jdk11 alp-jdk11
-docker exec -it alp-jdk11 sh
-```
-
-コンテナのプロンプトで以下のコマンドを実行してください。
+Dockerfile、docker-entry.htmlを保存し、以下のコマンドを実行してください。
 
 ```sh
-cat /etc/os-release
-java -version
+docker build -t mywebserver .
 ```
 
-**Java11インストール済みAlpineLinux**のコンテナが起動していることが確認できます。
+これで、**docker-entry.htmlを追加したNginx**のイメージが作成できました。
+
+---
+
+### 作成したイメージでコンテナを起動
+
+以下のコマンドでコンテナを起動してください。
+
+
+```sh
+docker run -d --name mywebserver -p 81:80 mywebserver
+```
+
+コンテナが起動したら、ブラウザで
+<a href="http://localhost:81/docker-entry.html">http://localhost:81/docker-entry.html</a>
+にアクセスしてください。
+作成した**dokcer-entry.html**が表示できます。
 
 ---
 
 ### イメージとは
 
-コンテナを起動したサーバーとすると、**イメージ**は**サーバーを構築するためのインストールディスク**のようなものです。
-起動したいOS・アプリケーションを**Dockerfile**に記述して**docker build**コマンドでイメージを作成します。
-作成したイメージからコンテナを起動することで、サーバーを運用することができます。
-以下のコマンドでDockerにインストールしているイメージの一覧を表示できます。
+**イメージ**は、要するに**サーバーのインストールメディア**です。
+
+イメージを作っておけば、OSやアプリケーションがセットアップされた状態のコンテナを即座に作成することができます。
 
 ```sh
 docker images
 # 出力
-REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-alp-jdk11           latest              4f50dd900ea4        32 seconds ago      186MB
-alpine              latest              965ea09ff2eb        8 days ago          5.55MB
-redmine             latest              8023a425328b        8 days ago          511MB
-postgres            latest              f88dfa384cc4        13 days ago         348MB
+REPOSITORY          TAG                 IMAGE ID            CREATED              SIZE
+mywebserver         latest              1d0bbf6552e1        19 seconds ago      126MB
+nginx               latest              540a289bab6c        9 days ago          126MB
+redmine             latest              8023a425328b        10 days ago         511MB
 ```
 
 ---
 
-### コンテナの停止
+### ボリュームのマウント(1/4)
 
-<div style="font-size:0.8em;">
+コンテナに保存された情報はコンテナを削除すると失われます。
+コンテナの情報を永続化するためには**ボリューム**を使用します。
 
-以下のコマンドを実行してください。
-
-```sh
-docker stop alp-jdk11
-docker exec -it alp-jdk11 sh
-# 出力
-Error response from daemon: Container [ContainerID] is not running
-```
-
-コンテナが停止して、コンテナのシェルにログインできなくなります。
-**-a**オプションでコンテナ一覧に停止コンテナを表示することができます。
+以下のコマンドを実行し、share-htmlディレクトリとindex.htmlを作成してください。
 
 ```sh
-docker ps
-# 停止中のコンテナは表示されない
-CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                    NAMES
-fd981bfb6e91        redmine             "/docker-entrypoint.…"   About a minute ago   Up About a minute   0.0.0.0:3000->3000/tcp   red
-
-docker ps -a
-# 停止中含む全てのコンテナを表示
-CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS                        PORTS                    NAMES
-daff9cb3c91c        alp-jdk11           "tail -f /dev/null"      53 seconds ago       Exited (137) 19 seconds ago                            alp-jdk11
-fd981bfb6e91        redmine             "/docker-entrypoint.…"   About a minute ago   Up About a minute             0.0.0.0:3000->3000/tcp   red
-```
-
-</div>
-
----
-
-### 作成済みコンテナの起動
-
-以下のコマンドを実行してください。
-
-```sh
-docker start alp-jdk11
-```
-
-作成済みのコンテナを起動することができます。
-
-```sh
-docker ps
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-daff9cb3c91c        alp-jdk11           "tail -f /dev/null"      3 minutes ago       Up 4 seconds                                 alp-jdk11
-fd981bfb6e91        redmine             "/docker-entrypoint.…"   4 minutes ago       Up 4 minutes        0.0.0.0:3000->3000/tcp   red
+cd ..
+mkdir share-html
+code share-html/index.html
 ```
 
 ---
 
-### コンテナの削除(1/2)
+### ボリュームのマウント(2/4)
 
-<div style="font-size:0.8em;">
+VSCodeがindex.htmlを開いたら以下の内容を貼り付けてください。
 
-以下コマンドでalp-jdk11にファイルを作成します。
-
-```sh
-docker exec -it alp-jdk11 sh
-# コンテナのプロンプトで
-echo "docker entry" > /mnt/entry.txt
-ls /mnt/entry.txt
-# 出力
-/mnt/entry.txt
-```
-
-コマンド終了後、コンテナを出て以下のコマンドを実行してください。
-
-```sh
-docker stop alp-jdk11
-docker rm alp-jdk11
-```
-
-**docker rm**コマンドでコンテナが削除され、コンテナの一覧でも表示されなくなります。
-
-```sh
-docker ps -a
-# 出力
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-fd981bfb6e91        redmine             "/docker-entrypoint.…"   5 minutes ago       Up 5 minutes        0.0.0.0:3000->3000/tcp   red
-```
-
-</div>
-
----
-
-### コンテナの削除(2/2)
-
-以下のコマンドを再実行してコンテナを作成て、コンテナに入ります。
-
-```sh
-docker run -d --name alp-jdk11 alp-jdk11
-docker exec -it alp-jdk11 sh
-```
-
-コンテナのプロンプトで以下のコマンドを実行すると、コンテナを削除する前に作成したファイルが存在しません。
-
-```sh
-ls /mnt/entry.txt
-```
-
-コンテナを削除したことによって、コンテナに保存されたデータも削除されます。
-
----
-
-### ボリュームのマウント(1/3)
-
-コンテナを運用するため、**ボリューム**を使用してデータを永続化します。
-以下のコマンドを実行してください。
-
-```sh
-docker stop alp-jdk11
-docker rm alp-jdk11
-docker run -d --name alp-jdk11 -v alp_data:/mnt alp-jdk11
-```
-
-**-v**オプションで、ボリュームをマウントすることができます。
-ボリュームが存在しない場合は自動で作成されます。
-
----
-
-### ボリュームのマウント(2/3)
-
-以下コマンドでボリュームをマウントしたディレクトリにファイルを作成します。
-
-```sh
-docker exec -it alp-jdk11 sh
-# コンテナのプロンプトで
-echo "docker entry" > /mnt/entry.txt
-ls /mnt/entry.txt
-# 出力
-/mnt/entry.txt
-```
-
-ファイルを作成したら、コンテナを出てコンテナを削除してください。
-
-```sh
-docker stop alp-jdk11
-docker rm alp-jdk11
+```html
+<html><body><h1>WebServer mount share directory</h1></body></html>
 ```
 
 ---
 
-### ボリュームのマウント(3/3)
+### ボリュームのマウント(3/4)
 
-
-以下のコマンドでコンテナを再作成、作成ファイルを確認してください。
+index.htmlを保存し、以下のコマンドでコンテナを起動してください。
 
 ```sh
-docker run -d --name alp-jdk11 -v alp_data:/mnt alp-jdk11
-docker exec -it alp-jdk11 sh
-# コンテナのプロンプトで
-ls /mnt/entry.txt
+# Windows
+for /f "usebackq tokens=*" %i IN (`cd`) DO @set current_dir=%i
+docker run -d --name mountwebserver -p 82:80 -v %current_dir%/share-html:/usr/share/nginx/html -v web_mnt:/mnt nginx
+
+# Mac
+docker run -d --name mountwebserver -p 82:80 -v ${PWD}/share-html:/usr/share/nginx/html -v web_mnt:/mnt nginx
 ```
 
-コンテナが削除されても、ボリュームに保存されたデータは削除されません。
-データが保存されたボリュームをマウントすることで、保存されたデータを参照することができます。
+<a href="http://localhost:82/">http://localhost:82/</a>にアクセスすると、作成したページが表示されます。
 
 ---
 
-### ボリュームとは
+### ボリュームのマウント(4/4)
 
-コンテナに**ボリューム**をマウントすることで、マウントしたディレクトリのデータを保存できます。
-コンテナをサーバーとするとボリュームは**HDDやSSDのような記憶装置**の役割を果たします。
-コンテナ作成時にマウントすることで、コンテナの作業データをボリュームに保存、使用することができます。
-以下コマンドで作成したボリュームを表示できます。
+docker runに**-v**オプションをつけることでボリュームをマウントすることができます。  
+オプションのフォーマットは**-v [ボリューム]:[コンテナのディレクトリ]**です。
+
+---
+
+### ボリュームの種類(1/2)
+
+* 共有ディレクトリ  
+オプションを**-v [ホストOSのパス]:[ディレクトリ]**と指定すると、
+ホストOSとコンテナの共有ディレクトリとして扱うことができます。
+
+---
+
+### ボリュームの種類(2/2)
+
+* NamedVolume  
+オプションを**-v [任意の名前]:[ディレクトリ]**と指定すると、**NamedVolume**と呼ばれるボリュームをマウントします。
+ホストOSからボリューム内のファイル操作ができないので、データを安全に保存することができます。
 
 ```sh
 docker volume ls
 # 出力
 DRIVER              VOLUME NAME
-local               alp_data
+local               web_mnt
 ```
+
+---
+
+### ボリュームとは
+
+**ボリューム**は、要するに**HDDやSSDのような記憶装置**です。
+
+コンテナにマウントすることで、コンテナのデータをボリュームに保存することができます。
 
 ---
 
@@ -376,7 +295,7 @@ docker exec red ls
 
 ---
 
-### ファイルコピー
+### ファイルコピー(1/2)
 
 コンテナ・ホストOSそれぞれ相互にファイルをコピーすることができます。
 以下のコマンドを実行してください。
@@ -391,6 +310,10 @@ ls CONTRIBUTING.md
 
 コンテナのCONTRIBUTING.mdをホストOSにコピーすることができます。
 
+---
+
+### ファイルコピー(2/2)
+
 コンテナ・ホストOSのパスを逆にすることで、ホストOSのファイルをコンテナにコピーすることもできます。
 
 ```sh
@@ -400,19 +323,104 @@ docker exec red ls /tmp
 
 ---
 
-### ボリュームの削除
+### コンテナの停止
 
-不要になったボリュームは削除できます。
+<div style="font-size:0.8em;">
+
 以下のコマンドを実行してください。
 
 ```sh
-docker stop alp-jdk11
-docker rm alp-jdk11
-docker volume rm alp_data
+docker stop red
+```
+
+コンテナが停止して、<a href="http://localhost:3000">http://localhost:3000</a>にアクセスできなくなります。
+**-a**オプションでコンテナ一覧に停止コンテナを表示することができます。
+
+```sh
+docker ps
+# 停止中のコンテナは表示されない
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                NAMES
+b8eaaaae6450        nginx               "nginx -g 'daemon of…"   5 minutes ago       Up 33 seconds       0.0.0.0:82->80/tcp   mountwebserver
+3b4500688148        mywebserver         "nginx -g 'daemon of…"   5 minutes ago       Up 27 seconds       0.0.0.0:81->80/tcp   mywebserver
+
+docker ps -a
+# 停止中を含む全てのコンテナを表示
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                      PORTS                NAMES
+b8eaaaae6450        nginx               "nginx -g 'daemon of…"   5 minutes ago       Up 47 seconds               0.0.0.0:82->80/tcp   mountwebserver
+3b4500688148        mywebserver         "nginx -g 'daemon of…"   6 minutes ago       Up 41 seconds               0.0.0.0:81->80/tcp   mywebserver
+16830ca679ba        redmine             "/docker-entrypoint.…"   8 minutes ago       Exited (1) 16 seconds ago                        red
+```
+
+</div>
+
+---
+
+### 作成済みコンテナの起動
+
+以下のコマンドを実行してください。
+
+```sh
+docker start red
+```
+
+作成済みのコンテナを起動することができます。
+
+```sh
+docker ps
+# 出力
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+b8eaaaae6450        nginx               "nginx -g 'daemon of…"   5 minutes ago       Up About a minute   0.0.0.0:82->80/tcp       mountwebserver
+3b4500688148        mywebserver         "nginx -g 'daemon of…"   6 minutes ago       Up About a minute   0.0.0.0:81->80/tcp       mywebserver
+16830ca679ba        redmine             "/docker-entrypoint.…"   8 minutes ago       Up 1 second         0.0.0.0:3000->3000/tcp   red
+```
+
+---
+
+### コンテナの削除
+
+以下のコマンドを実行してください。
+
+```sh
+docker stop red mywebserver mountwebserver
+docker rm red mywebserver mountwebserver
+```
+
+コンテナが削除され、コンテナの一覧でも表示されなくなります。
+
+```sh
+docker ps -a
+# 出力
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+```
+
+コンテナに保存されたデータも併せて削除されますが、ボリュームに保存されたデータは削除されません。
+
+---
+
+### ボリュームの削除
+
+ボリュームは以下のコマンドで削除できます。
+
+```sh
+docker volume rm web_mnt
 docker volume ls
 ```
 
-**docker volume rm**でボリュームが削除され、**docker volume ls**で表示されなくなります。
+**docker volume ls**で**web_mnt**が表示されなくなります。
+
+---
+
+
+### イメージの削除
+
+イメージは以下のコマンドで削除できます。
+
+```sh
+docker rmi mywebserver
+docker images
+```
+
+**docker images**で**mywebserver**が表示されなくなります。
 
 ---
 
@@ -448,38 +456,54 @@ dokcer runに**--rm**オプションを追加すると、コンテナ終了時�
 
 ### イメージの作成
 
-Dockerは独自のイメージを作成することができます。
-Redmine-PostgreSQL連携環境の構築を通してイメージの作成方法を理解します。
+Nginxをプロキシサーバーとして構築し、Nginx経由でRedmineにアクセスする環境の構築を通してイメージの作成方法を理解します。
 
-1. PostgreSQLを使用する設定のRedmineイメージを作成
-1. Redmine-PostgreSQL連携環境を起動
+1. プロキシ設定を追加したnginxイメージを作成
+1. Nginx-Redmine連携環境を起動
 
-作成の前に、ここまでで使用したRedmineを停止、削除してください。
+---
 
+### カスタムNginxイメージの作成(1/2)
+
+1. proxyディレクトリとproxy.conf(Nginxのプロキシ設定ファイル)、Dockerfileを作成
 ```sh
-docker stop red
-docker rm red
+mkdir proxy
+code proxy/proxy.conf
+code proxy/Dockerfile
+```
+
+2. VSCodeのproxy.confに以下の内容を貼り付けて保存
+```
+server {
+    listen  80;
+    server_name  localhost;
+
+    location / {
+        proxy_pass http://red:3000;
+    }
+}
 ```
 
 ---
 
-### カスタムRedmineイメージの作成
+### カスタムNginxイメージの作成(2/2)
 
-1. redディレクトリを作成
-1. redディレクトリに<a href="./red/database.yml">database.yml</a>(PostgreSQL接続設定ファイル)を作成  
-参考：http://guide.redmine.jp/RedmineInstall/#step-3-
-1. redディレクトリに以下内容の**Dockerfile**を作成
+3. VSCodeのDockerfileに以下の内容を貼り付けて保存
 ```docker
-FROM redmine
-ADD database.yml /usr/src/redmine/config
+FROM nginx
+RUN rm -f /etc/nginx/conf.d/*
+ADD proxy.conf /etc/nginx/conf.d
 ```
-1. 以下コマンドを実行してイメージを作成
+
+4. 以下コマンドを実行してイメージを作成
 ```sh
-docker build -t red red/
+docker build -t proxy proxy/
 docker images
 # 出力
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-red                 latest              21d9ee9e836b        17 seconds ago      511MB
+proxy               latest              3bb82046179c        7 seconds ago       126MB
+nginx               latest              540a289bab6c        3 weeks ago         126MB
+redmine             latest              8023a425328b        3 weeks ago         511MB
 ```
 
 ---
@@ -489,80 +513,76 @@ red                 latest              21d9ee9e836b        17 seconds ago      
 以下のコマンドを実行すると、連携環境が起動できます。
 
 ```sh
-# postgresの起動
-docker run -d --name psql postgres
-# redmineの起動
-docker run -d --name red --link psql:psql -p 3000:3000 red
+# Redmineの起動
+docker run -d --name red redmine
+# カスタムNginxの起動
+docker run -d --name proxy --link red:red -p 80:80 proxy
 ```
 
-起動後、ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセス、
-画面右上のログインからID:admin/PW:adminでログインして、パスワードを変更してください。  
-パスワード変更後、<a href="http://localhost:3000/admin/info">http://localhost:3000/admin/info</a>にアクセスして、
-**Database adapter**が**PostgreSQL**となっていることを確認してください。(デフォルトはSQLite)
+起動後、ブラウザで<a href="http://localhost">http://localhost</a>にアクセスしてください。
+カスタムNginxコンテナで指定されている80番ポートへのアクセスで、Redmineへアクセスできます。
 
 ---
 
 ### Composeとは
 
-Redmine-PostgreSQL連携環境を構築しましたが、dockerコマンドではそれぞれ個別に起動する必要があります。
-**Compose**を使用すると、Redmine,PostgreSQLコンテナを一括で管理することができます。
-Redmine-PostgreSQL連携環境をComposeで構築します。
+前述の連携環境はNginx、Redmineのコンテナを個別に起動しました。
 
-以下コマンドでRedmine, PostgreSQLのコンテナと、カスタムRedmineイメージを削除してください。
+**Compose**を使用することで複数のコンテナを一括で起動することができます。
+同様の連携環境をComposeで構築することで、Composeの構築方法を学びます。
+
+---
+
+### 事前準備
+
+以下コマンドでカスタムNginx, Redmineのコンテナと、カスタムNginxイメージを削除してください。
 
 ```sh
-docker stop psql red
-docker rm psql red
-docker rmi red
+docker stop proxy red
+docker rm proxy red
+docker rmi proxy
 ```
 
 ---
 
 ### Composeの作成(1/2)
 
-<div style="font-size:0.7em;">
+Composeは**docker-compose.yml**ファイルで管理します。
+以下のコマンドを実行して、docker-compose.ymlを作成してください。
 
-Composeは**docker-compose.yml**ファイルで管理します。  
-以下内容をコピーして、<a href="./docker-compose.yml">**docker-compose.yml**</a>という名前で保存してください。
-
-```yml
-version: "3.7"
-services:
-  red:
-    build:
-      context: ./red
-    ports:
-      - 3000:3000
-    volumes:
-      - redmine_data:/usr/src/redmine
-    depends_on:
-      - psql
-
-  psql:
-    image: postgres
-    volumes: 
-      - psql_data:/var/lib/postgresql/data
-
-volumes:
-  redmine_data:
-  psql_data:
 ```
-
-</div>
+code docker-compose.yml
+```
 
 ---
 
 ### Composeの作成(2/2)
 
-ここまでで、以下ディレクトリ構成となっている状態です。
+VSCodeのdocker-compose.ymlに以下内容を貼り付けて保存してください。
 
-```sh
-[WorkDirectory]
- |- docker-compose.yml
- `- red/
-     |- database.yml
-     `- Dockerfile
+<dev style="font-size: 0.8em;">
+
+```yml
+version: "3.7"
+services:
+  red:
+    image: redmine
+    volumes:
+      - redmine_data:/usr/src/redmine
+
+  proxy:
+    build:
+      context: ./proxy
+    ports: 
+      - 80:80
+    depends_on:
+      - red
+
+volumes:
+  redmine_data:
 ```
+
+</dev>
 
 ---
 
@@ -574,24 +594,23 @@ volumes:
 docker-compose up -d
 ```
 
-起動後、ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセス、
-画面右上のログインからID:admin/PW:adminでログインして、パスワードを変更してください。  
-パスワード変更後、<a href="http://localhost:3000/admin/info">http://localhost:3000/admin/info</a>にアクセスして、
-**Database adapter**が**PostgreSQL**となっていることを確認してください。(デフォルトはSQLite)
+起動後、ブラウザで<a href="http://localhost">http://localhost</a>にアクセスしてください。
+イメージ作成時と同様、80番ポートへのアクセスでRedmineへアクセスできます。
 
 ---
 
 ### Composeのコンテナ確認
+
 
 以下のコマンドでdocker-compose.ymlで管理しているコンテナが確認できます。
 
 ```sh
 docker-compose ps
 # 出力
-    Name                   Command               State           Ports
--------------------------------------------------------------------------------
-docker_psql_1   docker-entrypoint.sh postgres    Up      5432/tcp
-docker_red_1    /docker-entrypoint.sh rail ...   Up      0.0.0.0:3000->3000/tcp
+     Name                   Command               State         Ports
+----------------------------------------------------------------------------
+docker_proxy_1   nginx -g daemon off;             Up      0.0.0.0:80->80/tcp
+docker_red_1     /docker-entrypoint.sh rail ...   Up      3000/tcp
 ```
 
 ---
@@ -605,10 +624,10 @@ docker-compose psでは、オプション無しで停止中のコンテナを表
 docker-compose stop
 docker-compose ps
 # 出力
-    Name                   Command               State    Ports
----------------------------------------------------------------
-docker_psql_1   docker-entrypoint.sh postgres    Exit 0
-docker_red_1    /docker-entrypoint.sh rail ...   Exit 1
+     Name                   Command               State    Ports
+----------------------------------------------------------------
+docker_proxy_1   nginx -g daemon off;             Exit 0
+docker_red_1     /docker-entrypoint.sh rail ...   Exit 1
 ```
 
 ---
@@ -621,10 +640,10 @@ docker_red_1    /docker-entrypoint.sh rail ...   Exit 1
 docker-compose start
 docker-compose ps
 # 出力
-    Name                   Command               State           Ports
--------------------------------------------------------------------------------
-docker_psql_1   docker-entrypoint.sh postgres    Up      5432/tcp
-docker_red_1    /docker-entrypoint.sh rail ...   Up      0.0.0.0:3000->3000/tcp
+     Name                   Command               State         Ports
+----------------------------------------------------------------------------
+docker_proxy_1   nginx -g daemon off;             Up      0.0.0.0:80->80/tcp
+docker_red_1     /docker-entrypoint.sh rail ...   Up      3000/tcp
 ```
 
 ---
@@ -636,8 +655,8 @@ Composeのログ確認は、全コンテナのログの一括確認、コンテ�
 ```
 # 全コンテナのログを表示
 docker-compose logs -f
-# redmineのログを表示
-dokcer-compose logs -f red
+# Nginxのログを表示
+dokcer-compose logs -f proxy
 ```
 
 ---
