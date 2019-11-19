@@ -13,9 +13,11 @@ title: Docker入門ハンズオン
 - はじめに
 - 環境の準備
 - Dockerの構成要素
-- Dockerの基本操作
+- ハンズオン：Dockerの基本操作
 - コンテナの用途
-- イメージ・composeの作成
+- 連携環境の作成
+- Composeとは
+- ハンズオン：Composeの作成
 - まとめ
 
 ---
@@ -60,11 +62,10 @@ Windows 又は MacでCLI操作ができること
 コマンドプロンプト(Windows) / ターミナル(macOS)で以下のコマンドを実行してください。
 
 ```sh
-docker run -d --name red -p 3000:3000 redmine
+docker run -d --name psql postgres
 ```
 
-コマンドが終了したら、ブラウザで<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセスしてください。
-Redmineのトップページが表示されることを確認します。
+これで、DockerでPostgreSQLサーバーが起動しました。
 
 ---
 
@@ -73,20 +74,21 @@ Redmineのトップページが表示されることを確認します。
 以下のコマンドを実行してください。
 
 ```sh
-docker exec -it red bash
+docker exec -it psql bash
 # コンテナのOSのプロンプト
-root@3afe85b72ca6:/usr/src/redmine#
+root@21321a7c78f9:/# 
 ```
 
 新しいプロンプトが始まります。これはコンテナのOS(Linux)のプロンプト(bash)です。
-lsコマンドを実行すると、コンテナ内のファイルの一覧が表示されます。
+psqlコマンドを実行すると、PostgreSQLに接続することができます。
 
 ```sh
-ls
+psql -U postgres
 # 出力
-CONTRIBUTING.md  Gemfile.lock.mysql2	  Gemfile.lock.sqlserver  app		config	   doc	  lib	   public  tmp
-Gemfile		 Gemfile.lock.postgresql  README.rdoc		  appveyor.yml	config.ru  extra  log	   sqlite  vendor
-Gemfile.lock	 Gemfile.lock.sqlite3	  Rakefile		  bin		db	   files  plugins  test
+psql (12.0 (Debian 12.0-2.pgdg100+1))
+Type "help" for help.
+
+postgres=#
 ```
 ---
 
@@ -99,56 +101,50 @@ Gemfile.lock	 Gemfile.lock.sqlite3	  Rakefile		  bin		db	   files  plugins  test
 ```sh
 docker ps
 # 出力
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-f4a5f3fe4fa1        redmine             "/docker-entrypoint.…"   20 seconds ago      Up 19 seconds       0.0.0.0:3000->3000/tcp   red
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+21321a7c78f9        postgres            "docker-entrypoint.s…"   3 minutes ago       Up 2 minutes        5432/tcp            psql
 ```
 
 ---
 
 ### イメージの作成(1/3)
 
-前述の**docker run**コマンドは<a href="https://hub.docker.com/_/redmine">Docker Hub</a>
-で公開されているRedmineの**Dockerイメージ**でコンテナを起動しています。
+前述の**docker run**コマンドは<a href="https://hub.docker.com/_/postgres">Docker Hub</a>
+で公開されているPostgreSQLの**Dockerイメージ**でコンテナを起動しています。
 
 **Dockerイメージ**は公開されているイメージをカスタマイズして作ることもできます。
 
-以下のコマンドを実行し、mywebserverディレクトリとDockerfile、docker-entry.htmlファイルを作成してください。
+以下のコマンドを実行し、jp-psqlディレクトリとDockerfileファイルを作成してください。
 
 ```sh
-mkdir mywebserver
-cd mywebserver
+mkdir jp-psql
+cd jp-psql
 code Dockerfile
-code docker-entry.html
 ```
 
 ---
 
 ### イメージの作成 (2/3)
 
-VSCodeがDockerfile、docker-entry.htmlを開いたら以下の内容を貼り付けてください。
+VSCodeがDockerfileを開いたら以下の内容を貼り付けてください。
 
-・Dockerfile
 ```docker
-FROM nginx
-ADD docker-entry.html /usr/share/nginx/html
-```
-
-・docker-entry.html
-```html
-<html><body><h1>WebServer working by docker</h1></body></html>
+FROM postgres
+RUN localedef -i ja_JP -c -f UTF-8 -A /usr/share/locale/locale.alias ja_JP.UTF-8
+ENV LANG ja_JP.utf8
 ```
 
 ---
 
 ### イメージの作成 (3/3)
 
-Dockerfile、docker-entry.htmlを保存し、以下のコマンドを実行してください。
+Dockerfileを保存し、以下のコマンドを実行してください。
 
 ```sh
-docker build -t mywebserver .
+docker build -t jp-psql .
 ```
 
-これで、**docker-entry.htmlを追加したNginx**のイメージが作成できました。
+これで、**ロケールを日本に変更したPostgreSQL**のイメージが作成できました。
 
 ---
 
@@ -156,15 +152,24 @@ docker build -t mywebserver .
 
 以下のコマンドでコンテナを起動してください。
 
-
 ```sh
-docker run -d --name mywebserver -p 81:80 mywebserver
+docker run -d --name jp-psql jp-psql
 ```
 
-コンテナが起動したら、ブラウザで
-<a href="http://localhost:81/docker-entry.html">http://localhost:81/docker-entry.html</a>
-にアクセスしてください。
-作成した**dokcer-entry.html**が表示できます。
+コンテナが起動したら、以下のコマンドを実行してください。
+
+```sh
+docker exec -it jp-psql bash
+# コンテナのプロンプトで
+psql -U postgres
+# 出力
+psql (12.0 (Debian 12.0-2.pgdg100+1))
+"help"でヘルプを表示します。
+
+postgres=#
+```
+
+ログインメッセージが日本語になっています。
 
 ---
 
@@ -177,60 +182,90 @@ docker run -d --name mywebserver -p 81:80 mywebserver
 ```sh
 docker images
 # 出力
-REPOSITORY          TAG                 IMAGE ID            CREATED              SIZE
-mywebserver         latest              1d0bbf6552e1        19 seconds ago      126MB
-nginx               latest              540a289bab6c        9 days ago          126MB
-redmine             latest              8023a425328b        10 days ago         511MB
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+jp-psql             latest              cad33107446c        17 seconds ago      352MB
+postgres            latest              f88dfa384cc4        4 weeks ago         348MB
 ```
 
 ---
 
 ### ボリュームのマウント(1/4)
 
-コンテナに保存された情報はコンテナを削除すると失われます。
-コンテナの情報を永続化するためには**ボリューム**を使用します。
+コンテナの起動時に外部ファイルを参照する、コンテナのデータを外部に保存するためには、**ボリューム**を使用します。
 
-以下のコマンドを実行し、share-htmlディレクトリとindex.htmlを作成してください。
+以下のコマンドを実行し、initdbディレクトリとinitilize.shを作成してください。
+
 
 ```sh
 cd ..
-mkdir share-html
-code share-html/index.html
+mkdir initdb
+code initdb/initilize.sh
 ```
 
 ---
 
 ### ボリュームのマウント(2/4)
 
-VSCodeがindex.htmlを開いたら以下の内容を貼り付けてください。
+VSCodeがinitilize.shを開いたら以下の内容を貼り付けて、改行コードをLFにしてください。
 
-```html
-<html><body><h1>WebServer mount share directory</h1></body></html>
+・initilize.sh
+
+```sh
+#!/bin/bash
+set -e
+
+psql -v ON_ERROR_STOP=1 -U postgres <<-EOSQL
+  CREATE USER docker;
+  CREATE DATABASE docker;
+  GRANT ALL PRIVILEGES ON DATABASE docker TO docker;
+EOSQL
 ```
+
+・VSCode：改行コードの指定  
+<img src="vscode-bottom.png"/>
 
 ---
 
 ### ボリュームのマウント(3/4)
 
-index.htmlを保存し、以下のコマンドでコンテナを起動してください。
+initilize.shを保存し、以下のコマンドでコンテナを起動してください。
 
 ```sh
 # Windows
-for /f "usebackq tokens=*" %i IN (`cd`) DO @set current_dir=%i
-docker run -d --name mountwebserver -p 82:80 -v %current_dir%/share-html:/usr/share/nginx/html -v web_mnt:/mnt nginx
+for /f "usebackq tokens=*" %i IN (`cd`) DO @set PWD=%i
+docker run -d --name mnt-psql -v %PWD%/initdb:/docker-entrypoint-initdb.d -v psql_data:/var/lib/postgresql/data jp-psql
 
 # Mac
-docker run -d --name mountwebserver -p 82:80 -v ${PWD}/share-html:/usr/share/nginx/html -v web_mnt:/mnt nginx
+docker run -d --name mnt-psql -v ${PWD}/initdb:/docker-entrypoint-initdb.d -v psql_data:/var/lib/postgresql/data jp-psql
 ```
-
-<a href="http://localhost:82/">http://localhost:82/</a>にアクセスすると、作成したページが表示されます。
 
 ---
 
 ### ボリュームのマウント(4/4)
 
-docker runに**-v**オプションをつけることでボリュームをマウントすることができます。  
-オプションのフォーマットは**-v [ボリューム]:[コンテナのディレクトリ]**です。
+以下のコマンドを実行してください。
+
+```sh
+docker exec -it mnt-psql bash
+# コンテナのプロンプトで
+psql -U docker
+# 出力
+psql (12.0 (Debian 12.0-2.pgdg100+1))
+"help"でヘルプを表示します。
+
+docker=>
+```
+
+dockerユーザーでdocker DBにログインできます。
+
+---
+
+### ボリュームとは
+
+**ボリューム**とは、要するに**外付け記憶媒体**です。
+
+ボリュームをコンテナにマウント(接続)することで、
+コンテナ内に外部からデータを持ち込んだり、コンテナ内のデータを外部に持ち出すことができます。
 
 ---
 
@@ -252,175 +287,123 @@ docker runに**-v**オプションをつけることでボリュームをマウ�
 docker volume ls
 # 出力
 DRIVER              VOLUME NAME
-local               web_mnt
+local               psql_data
 ```
 
 ---
 
-### ボリュームとは
-
-**ボリューム**は、要するに**HDDやSSDのような記憶装置**です。
-
-コンテナにマウントすることで、コンテナのデータをボリュームに保存することができます。
-
----
-
+## ハンズオン
 ## Dockerの基本操作
 
 ---
 
-### ログの確認
+### 課題
 
-以下のコマンドでDockerのログを表示できます。
+以下の課題を通してDockerの基本操作を学びます。
 
-```sh
-docker logs -f red
-```
+1. psqlコンテナのログを表示する。
 
-ログを表示したまま、<a href="http://localhost:3000" target="redmine">http://localhost:3000</a>にアクセスしてログの出力を確認してください。
-ログの停止は**Ctrl+c**をタイプしてください。
+2. mnt-psqlの/docker-entrypoint-initdb.d/initilize.shをホストOSにコピーする。
 
----
+3. initilize.shをpsqlの/tmpにコピーして、/tmp/initilize.shを実行する。
 
-### コマンドの実行
+4. psqlコンテナのbashを経由せずに、PostgreSQLにdockerユーザーでログインする。
+(psqlログインコマンド：psql -U docker)
 
-コンテナの中に入らなくても、コンテナでコマンドを実行することができます。
-以下のコマンドを実行してください。
+5. psql、jp-psql、mnt-psqlコンテナを停止、削除する。
 
-```sh
-docker exec red ls
-```
-
-コンテナに入ってlsを実行した場合と同じファイルの一覧が表示されます。
+6. jp-psqlイメージを削除する。
 
 ---
 
-### ファイルコピー(1/2)
+### 基本操作(1/4)
 
-コンテナ・ホストOSそれぞれ相互にファイルをコピーすることができます。
-以下のコマンドを実行してください。
+・ログの表示
 
 ```sh
-docker cp red:/usr/src/redmine/CONTRIBUTING.md .
-# Windows
-dir CONTRIBUTING.md
-# Mac
-ls CONTRIBUTING.md
+# ログを表示してプロンプトに戻る
+docker logs [コンテナ名]
+# プロンプトに戻らずログを表示し続ける(Ctrl+cで停止)
+dokcer logs -f [コンテナ名]
 ```
 
-コンテナのCONTRIBUTING.mdをホストOSにコピーすることができます。
-
----
-
-### ファイルコピー(2/2)
-
-コンテナ・ホストOSのパスを逆にすることで、ホストOSのファイルをコンテナにコピーすることもできます。
+・コンテナでのコマンド実行
 
 ```sh
-docker cp CONTRIBUTING.md red:/tmp/
-docker exec red ls /tmp
+# コマンドを実行してプロンプトに戻る
+docker exec [コンテナ名] [実行コマンド]
+# bash/psql等のターミナルを操作
+docker exec -it [コンテナ名] [ターミナル]
 ```
 
 ---
 
-### コンテナの停止
+### 基本操作(2/4)
 
-<div style="font-size:0.8em;">
-
-以下のコマンドを実行してください。
+・作成済みコンテナの起動
 
 ```sh
-docker stop red
+docker start [コンテナ名]
 ```
 
-コンテナが停止して、<a href="http://localhost:3000">http://localhost:3000</a>にアクセスできなくなります。
-**-a**オプションでコンテナ一覧に停止コンテナを表示することができます。
+・起動中コンテナの停止
 
 ```sh
-docker ps
-# 停止中のコンテナは表示されない
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                NAMES
-b8eaaaae6450        nginx               "nginx -g 'daemon of…"   5 minutes ago       Up 33 seconds       0.0.0.0:82->80/tcp   mountwebserver
-3b4500688148        mywebserver         "nginx -g 'daemon of…"   5 minutes ago       Up 27 seconds       0.0.0.0:81->80/tcp   mywebserver
-
-docker ps -a
-# 停止中を含む全てのコンテナを表示
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                      PORTS                NAMES
-b8eaaaae6450        nginx               "nginx -g 'daemon of…"   5 minutes ago       Up 47 seconds               0.0.0.0:82->80/tcp   mountwebserver
-3b4500688148        mywebserver         "nginx -g 'daemon of…"   6 minutes ago       Up 41 seconds               0.0.0.0:81->80/tcp   mywebserver
-16830ca679ba        redmine             "/docker-entrypoint.…"   8 minutes ago       Exited (1) 16 seconds ago                        red
+docker stop [コンテナ名]
 ```
 
-</div>
-
----
-
-### 作成済みコンテナの起動
-
-以下のコマンドを実行してください。
+・停止中コンテナの削除
 
 ```sh
-docker start red
-```
-
-作成済みのコンテナを起動することができます。
-
-```sh
-docker ps
-# 出力
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-b8eaaaae6450        nginx               "nginx -g 'daemon of…"   5 minutes ago       Up About a minute   0.0.0.0:82->80/tcp       mountwebserver
-3b4500688148        mywebserver         "nginx -g 'daemon of…"   6 minutes ago       Up About a minute   0.0.0.0:81->80/tcp       mywebserver
-16830ca679ba        redmine             "/docker-entrypoint.…"   8 minutes ago       Up 1 second         0.0.0.0:3000->3000/tcp   red
+docker rm [コンテナ名]
 ```
 
 ---
 
-### コンテナの削除
+### 基本操作(3/4)
 
-以下のコマンドを実行してください。
+・ファイルコピー
 
 ```sh
-docker stop red mywebserver mountwebserver
-docker rm red mywebserver mountwebserver
+# ホストOSからコンテナへコピー
+docker cp [ファイルパス] [コンテナ名]:[コピー先ディレクトリ]
+# コンテナからホストOSへコピー
+docker cp [コンテナ名]:[ファイルパス] [コピー先ディレクトリ]
 ```
 
-コンテナが削除され、コンテナの一覧でも表示されなくなります。
+・イメージの確認
 
 ```sh
-docker ps -a
-# 出力
-CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
-```
-
-コンテナに保存されたデータも併せて削除されますが、ボリュームに保存されたデータは削除されません。
-
----
-
-### ボリュームの削除
-
-ボリュームは以下のコマンドで削除できます。
-
-```sh
-docker volume rm web_mnt
-docker volume ls
-```
-
-**docker volume ls**で**web_mnt**が表示されなくなります。
-
----
-
-
-### イメージの削除
-
-イメージは以下のコマンドで削除できます。
-
-```sh
-docker rmi mywebserver
 docker images
 ```
 
-**docker images**で**mywebserver**が表示されなくなります。
+・イメージ削除
+
+```sh
+docker rmi [イメージ名]
+```
+
+---
+
+### 基本操作(4/4)
+
+・ボリューム確認
+
+```sh
+docker volume ls
+```
+
+・ボリュームを指定して削除
+
+```sh
+docker volume rm [ボリューム名]
+```
+
+---
+
+## それでは
+
+## 作業を始めてください
 
 ---
 
@@ -435,229 +418,259 @@ docker images
 
 ---
 
-### 単独処理
+### 単独処理(1/2)
 
 以下のコマンドを実行してください。
 
 ```sh
-docker run --rm redmine ls
+# Windows
+for /f "usebackq tokens=*" %i IN (`cd`) DO @set PWD=%i
+docker run --rm -v psql_data:/target -v %PWD%:/backup postgres tar cfz /backup/psql_data.tar.gz -C /target .
+dir psql_data.tar.gz
+
+# Mac
+docker run --rm -v psql_data:/target -v ${PWD}:/backup postgres tar cfz /backup/psql_data.tar.gz -C /target .
+ls psql_data.tar.gz
+
+# 共通：コマンド完了後
 docker ps -a
 ```
 
-**docker exec red ls**と同様、redmineのファイルが表示されますが、コンテナ一覧にコンテナは存在しません。
+psql_data.tar.gzが作成できますが、コンテナ一覧にコンテナは存在しません。
+
+---
+
+### 単独処理(2/2)
+
 dokcer runに**--rm**オプションを追加すると、コンテナ終了時にコンテナを削除することができます。
 このオプションを利用することで、コンテナ単独での処理が可能です。
 
----
-
-## イメージ・Composeの作成
-
----
-
-### イメージの作成
-
-Nginxをプロキシサーバーとして構築し、Nginx経由でRedmineにアクセスする環境の構築を通してイメージの作成方法を理解します。
-
-1. プロキシ設定を追加したnginxイメージを作成
-1. Nginx-Redmine連携環境を起動
+先のコマンド例では、psql_dataボリュームのデータをバックアップしました。
+別の端末にバックアップをコピーしてコンテナでマウントすることで、同一の環境を構築することができます。
 
 ---
 
-### カスタムNginxイメージの作成(1/2)
+## 連携環境の作成
 
-1. proxyディレクトリとproxy.conf(Nginxのプロキシ設定ファイル)、Dockerfileを作成
+---
+
+### 連携環境(1/5)
+
+Dockerでは複数のコンテナで構成される連携環境を構築することができます。
+例として、PostgreSQLとphpPgAdminの連携環境構築します。
+
+---
+
+### 連携環境(2/5)
+
+以下のコマンドを実行して、phpPgAdminのDockerfileを作成します。
+
 ```sh
-mkdir proxy
-code proxy/proxy.conf
-code proxy/Dockerfile
+mkdir pgadmin
+code pgadmin/Dockerfile
 ```
 
-2. VSCodeのproxy.confに以下の内容を貼り付けて保存
-```
-server {
-    listen  80;
-    server_name  localhost;
+VSCodeが開いたら、以下の内容を貼り付けて保存してください。
 
-    location / {
-        proxy_pass http://red:3000;
-    }
-}
-```
-
----
-
-### カスタムNginxイメージの作成(2/2)
-
-3. VSCodeのDockerfileに以下の内容を貼り付けて保存
 ```docker
-FROM nginx
-RUN rm -f /etc/nginx/conf.d/*
-ADD proxy.conf /etc/nginx/conf.d
-```
+FROM dockage/phppgadmin
 
-4. 以下コマンドを実行してイメージを作成
-```sh
-docker build -t proxy proxy/
-docker images
-# 出力
-REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-proxy               latest              3bb82046179c        7 seconds ago       126MB
-nginx               latest              540a289bab6c        3 weeks ago         126MB
-redmine             latest              8023a425328b        3 weeks ago         511MB
+ENV PHP_PG_ADMIN_SERVER_HOST="jp-psql" \
+    PHP_PG_ADMIN_SERVER_PORT=5432
 ```
 
 ---
 
-### 連携環境の起動
+### 連携環境(3/5)
 
-以下のコマンドを実行すると、連携環境が起動できます。
+以下のコマンドを実行して、Dockerfileからイメージを作成します。
 
 ```sh
-# Redmineの起動
-docker run -d --name red redmine
-# カスタムNginxの起動
-docker run -d --name proxy --link red:red -p 80:80 proxy
+docker build -t pgadmin pgadmin/
 ```
 
-起動後、ブラウザで<a href="http://localhost">http://localhost</a>にアクセスしてください。
-カスタムNginxコンテナで指定されている80番ポートへのアクセスで、Redmineへアクセスできます。
+---
+
+### 連携環境(4/5)
+
+以下のコマンドで、PostgreSQL、phpPgAdminを起動します。
+
+```sh
+docker run -d --name jp-psql jp-psql
+docker run -d --name pgadmin -p 80:80 --link jp-psql:jp-psql pgadmin
+```
+
+ブラウザで<a href="http://localhost">http://localhost</a>にアクセスすると、phpPgAdminが表示できます。
+
+---
+
+### 連携環境(5/5)
+
+phpPgAdminが開いたら、"サーバー > PosgreSQL"をクリックして、"ユーザー名:postgres/パスワード:[空欄]"でログインしてください。
+
+jp-psqlコンテナにログインすることができます。
+
+<img src="pgadmin.png"/>
+
+---
+
+## Composeとは
 
 ---
 
 ### Composeとは
 
-前述の連携環境はNginx、Redmineのコンテナを個別に起動しました。
+前述の連携環境はPostgreSQL、phpPgAdminのコンテナを個別に起動しました。
 
 **Compose**を使用することで複数のコンテナを一括で起動することができます。
 同様の連携環境をComposeで構築することで、Composeの構築方法を学びます。
 
 ---
 
-### 事前準備
+### Composeファイル(1/4)
 
-以下コマンドでカスタムNginx, Redmineのコンテナと、カスタムNginxイメージを削除してください。
+Composeで起動するコンテナは**docker-compose.yml**で管理します。
+docker-compose.ymlの構成について説明します。
 
-```sh
-docker stop proxy red
-docker rm proxy red
-docker rmi proxy
-```
-
----
-
-### Composeの作成(1/2)
-
-Composeは**docker-compose.yml**ファイルで管理します。
-以下のコマンドを実行して、docker-compose.ymlを作成してください。
-
-```
-code docker-compose.yml
-```
-
----
-
-### Composeの作成(2/2)
-
-VSCodeのdocker-compose.ymlに以下内容を貼り付けて保存してください。
-
-<dev style="font-size: 0.8em;">
+* version  
+Composeファイルのバージョンを指定します。
+最新は3.7です。  
+参考：<a href="https://github.com/docker/compose/releases">https://github.com/docker/compose/releases</a>
 
 ```yml
 version: "3.7"
-services:
-  red:
-    image: redmine
-    volumes:
-      - redmine_data:/usr/src/redmine
-
-  proxy:
-    build:
-      context: ./proxy
-    ports: 
-      - 80:80
-    depends_on:
-      - red
-
-volumes:
-  redmine_data:
 ```
-
-</dev>
 
 ---
 
-### Composeの起動
+### Composeファイル(2/4)
 
-以下のコマンドでComposeの起動ができます。
+* services  
+Composeで起動するコンテナを定義します。
+ここでは、PostgreSQLを起動する簡単な例を記載します。
+
+```yml
+services:
+  psql:              # サービス名
+    image: postgres  # コンテナを起動するイメージ
+    volumes:         # ボリュームを指定
+      - ./initdb:/docker-entrypoint-initdb.d  # 共有ディレクトリ
+      - psql_data:/var/lib/postgresql/data    # NamedVolume
+    port:            # 解放するポートを指定
+      - 5432:5432
+```
+
+参考：<a href="http://docs.docker.jp/compose/compose-file.html">Composeファイル・リファレンス</a>
+
+---
+
+### Composeファイル(3/4)
+
+* volumes  
+servicesでNamedVolumeを使用する場合、ここで定義します。
+dockerコマンドとは異なり、ボリュームは自動作成されません。
+
+```yml
+volumes:
+  psql_data:
+```
+
+---
+
+### Composeファイル(4/4)
+
+ここまでで説明した内容をマージしたdocker-compose.ymlの全体像は以下のようになります。
+
+```yml
+version: "3.7"
+
+services:
+  psql:
+    image: postgres
+    volumes:
+      - psql_data:/var/lib/postgresql/data
+    port:
+      - 5432:5432
+
+volumes:
+  psql_data:
+```
+
+---
+
+### Composeの基本コマンド
+
+docker-compose.ymlのあるディレクトリで、以下コマンドを実行するとComposeを操作できます。
+
+・Composeの起動
 
 ```sh
 docker-compose up -d
 ```
 
-起動後、ブラウザで<a href="http://localhost">http://localhost</a>にアクセスしてください。
-イメージ作成時と同様、80番ポートへのアクセスでRedmineへアクセスできます。
-
----
-
-### Composeのコンテナ確認
-
-
-以下のコマンドでdocker-compose.ymlで管理しているコンテナが確認できます。
-
-```sh
-docker-compose ps
-# 出力
-     Name                   Command               State         Ports
-----------------------------------------------------------------------------
-docker_proxy_1   nginx -g daemon off;             Up      0.0.0.0:80->80/tcp
-docker_red_1     /docker-entrypoint.sh rail ...   Up      3000/tcp
-```
-
----
-
-### Composeの停止
-
-以下のコマンドでComposeを停止できます。
-docker-compose psでは、オプション無しで停止中のコンテナを表示できます。
+・Composeの停止
 
 ```sh
 docker-compose stop
-docker-compose ps
-# 出力
-     Name                   Command               State    Ports
-----------------------------------------------------------------
-docker_proxy_1   nginx -g daemon off;             Exit 0
-docker_red_1     /docker-entrypoint.sh rail ...   Exit 1
 ```
 
----
-
-### 作成済みComposeの起動
-
-以下のコマンドで作成済みComposeの起動ができます。
+・作成済みComposeの起動
 
 ```sh
 docker-compose start
+```
+
+・コンテナの確認
+
+```sh
 docker-compose ps
-# 出力
-     Name                   Command               State         Ports
-----------------------------------------------------------------------------
-docker_proxy_1   nginx -g daemon off;             Up      0.0.0.0:80->80/tcp
-docker_red_1     /docker-entrypoint.sh rail ...   Up      3000/tcp
 ```
 
 ---
 
-### Composeのログ確認
+## ハンズオン
+## Composeの作成
 
-Composeのログ確認は、全コンテナのログの一括確認、コンテナ単位の確認ができます。
+---
 
+### ハンズオンの事前準備
+
+以下コマンドでPostgreSQL、phpPgAdminのコンテナを停止・削除してください。
+
+```sh
+docker stop pgadmin jp-psql
+docker rm pgadmin jp-psql
 ```
-# 全コンテナのログを表示
-docker-compose logs -f
-# Nginxのログを表示
-dokcer-compose logs -f proxy
-```
+
+---
+
+### 課題
+
+<div style="font-size:0.9em;">
+
+以下のComposeを作成してください。
+
+* PostgreSQL
+ * jp-psqlのDockerfileからイメージを作成して起動する
+ * initdb/initilize.shを起動時に実行する
+ * /var/lib/postgresql/dataにNamedVolumeをマウントする
+
+* phpPgAdmin
+ * dockage/phppgadminからコンテナを作成
+ * PostgreSQLの起動を待って起動する
+ * 前述のPostgreSQL:5432ポートに接続する
+ * 80ポートでアクセス可能とする
+
+作成できたらブラウザで<a href="http://localhost">http://localhost</a>にアクセスして、
+dockerユーザーでPostgreSQLにログインできることを確認してください。
+
+</div>
+
+---
+
+## それでは
+
+## 作業を始めてください
 
 ---
 
@@ -676,7 +689,7 @@ dokcer-compose logs -f proxy
 * Dockerfileを用意することで独自のイメージを作成できる
 * Composeにより、複数コンテナが連携するDockerアプリケーションを作成できる
  * 弊社プロダクト[sit-ds](https://github.com/sitoolkit/sit-ds)もComposeで実装
- * Jenkins, Redmine, Gitbucket, Sonarqubeのアセット
+ * Jenkins, Redmine, Gitbucket, Sonarqube, Artifactoryのアセット
  * 各種アプリケーションサーバーはLDAP認証 + SelfServicePasswordでPW一括管理
  * バックアップ・リストアをDocker単独処理で実現
 

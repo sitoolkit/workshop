@@ -1,17 +1,21 @@
 version: "3.7"
 services:
-  red:
-    image: redmine
-    volumes:
-      - redmine_data:/usr/src/redmine
-
-  proxy:
+  jp-psql:
     build:
-      context: ./proxy
+      context: ./jp-psql
+    volumes:
+      - ./initdb:/docker-entrypoint-initdb.d
+      - jp_psql_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dockage/phppgadmin
+    environment:
+      - PHP_PG_ADMIN_SERVER_HOST=jp-psql
+      - PHP_PG_ADMIN_SERVER_PORT=5432
     ports: 
       - 80:80
     depends_on:
-      - red
+      - jp-psql
 
 volumes:
-  redmine_data:
+  jp_psql_data:
