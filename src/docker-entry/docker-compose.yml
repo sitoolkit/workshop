@@ -1,21 +1,21 @@
 version: "3.7"
 services:
-  jp-psql:
+  jp-pg:
     build:
-      context: ./jp-psql
+      context: ./jp-pg
     volumes:
       - ./initdb:/docker-entrypoint-initdb.d
-      - jp_psql_data:/var/lib/postgresql/data
+      - jp_pg_data:/var/lib/postgresql/data
 
   pgadmin:
     image: dockage/phppgadmin
     environment:
-      - PHP_PG_ADMIN_SERVER_HOST=jp-psql
+      - PHP_PG_ADMIN_SERVER_HOST=jp-pg
       - PHP_PG_ADMIN_SERVER_PORT=5432
     ports: 
       - 80:80
     depends_on:
-      - jp-psql
+      - jp-pg
 
 volumes:
-  jp_psql_data:
+  jp_pg_data:
