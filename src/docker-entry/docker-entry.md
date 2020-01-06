@@ -44,8 +44,10 @@ Windows 又は MacでCLI操作ができること
 ハンズオンでは以下のソフトウェアが必要です。
 
 * Docker
- * Windows  
-   [Docker Desktop for Windows](https://docs.docker.com/docker-for-windows/install/)  
+ * Windows Home  
+   [Docker Toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/)  
+ * Windows Pro  
+   [Docker Desktop for Windows](https://docs.docker.com/docker-for-windows/install/)
  * Mac  
    [Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/install/)  
 
@@ -59,7 +61,7 @@ Windows 又は MacでCLI操作ができること
 
 ### コンテナを動かす
 
-コマンドプロンプト(Windows) / ターミナル(macOS)で以下のコマンドを実行してください。
+Docker Quickstart Terminal(Windows Home) / コマンドプロンプト(Windows Pro) / ターミナル(macOS)で以下のコマンドを実行してください。
 
 ```sh
 docker run -d --name pg postgres
@@ -85,7 +87,7 @@ psqlコマンドを実行すると、PostgreSQLに接続することができま
 ```sh
 psql -U postgres
 # 出力
-psql (12.0 (Debian 12.0-2.pgdg100+1))
+psql (12.1 (Debian 12.1-1.pgdg100+1))
 Type "help" for help.
 
 postgres=#
@@ -117,6 +119,10 @@ c715a39f1989        postgres            "docker-entrypoint.s…"   8 minutes ago
 以下のコマンドを実行し、jp-pgディレクトリとDockerfileファイルを作成してください。
 
 ```sh
+# Docker Toolboxは事前に以下を実施
+cd ${HOME}
+
+# 共通
 mkdir jp-pg
 cd jp-pg
 code Dockerfile
@@ -163,7 +169,7 @@ docker exec -it jp-pg bash
 # コンテナのプロンプトで
 psql -U postgres
 # 出力
-psql (12.0 (Debian 12.0-2.pgdg100+1))
+psql (12.1 (Debian 12.1-1.pgdg100+1))
 "help"でヘルプを表示します。
 
 postgres=#
@@ -191,7 +197,7 @@ postgres            latest              9eb7b0ce936d        2 days ago          
 
 ### ボリュームのマウント(1/4)
 
-コンテナの起動時に外部ファイルを参照する、コンテナのデータを外部に保存するためには、**ボリューム**を使用します。
+コンテナとホストOS間でファイルをやり取りするためには、**ボリューム**を使用します。
 
 以下のコマンドを実行し、initdbディレクトリとinitialize.sqlを作成してください。
 
@@ -221,10 +227,13 @@ GRANT ALL PRIVILEGES ON DATABASE mydb TO myuser;
 initialize.sqlを保存し、以下のコマンドでコンテナを起動してください。
 
 ```sh
-# Windows
+# コマンドプロンプト(Windows Pro)
 docker run -d --name mnt-pg -v %cd%/initdb:/docker-entrypoint-initdb.d -v pg_data:/var/lib/postgresql/data jp-pg
 
-# Mac
+# Docker Quickstart Terminal(Windows Home)
+docker run -d --name mnt-pg -v ${HOME}/initdb:/docker-entrypoint-initdb.d -v pg_data:/var/lib/postgresql/data jp-pg
+
+# ターミナル(macOS)
 docker run -d --name mnt-pg -v ${PWD}/initdb:/docker-entrypoint-initdb.d -v pg_data:/var/lib/postgresql/data jp-pg
 ```
 
@@ -245,7 +254,7 @@ psql (12.1 (Debian 12.1-1.pgdg100+1))
 mydb=>
 ```
 
-myuserでmydbにログインできます。
+ホストOSで作成した初期化SQLファイルがコンテナで実行されて、myuserでmydbにログインできます。
 
 ---
 
@@ -258,28 +267,28 @@ myuserでmydbにログインできます。
 
 ---
 
-### ボリュームの種類
+### ボリュームの使い方(1/2)
 
-<dev style="font-size:0.9em;">
+ボリュームをマウントするには、docker runに**"-v [ホストOSのパス or 任意の名称]:[コンテナのパス]"**オプションを指定します。
 
-ボリュームは共有ディレクトリとNamedVolumeの、2種類の使い方があります。
+* ホストOSのパスを指定  
+コンテナからホストOSのパスを参照することができます。  
+つまり、ホストOSとコンテナの共有ディレクトリのように使用することができます。
 
-* 共有ディレクトリ  
-オプションを**-v [ホストOSのパス]:[ディレクトリ]**と指定すると、
-ホストOSとコンテナの共有ディレクトリとして扱うことができます。
+---
 
-* NamedVolume  
-オプションを**-v [任意の名前]:[ディレクトリ]**と指定すると、**NamedVolume**と呼ばれるボリュームをマウントします。
-ホストOSからボリューム内のファイル操作ができないので、データを安全に保存することができます。
-NamedVolumeは以下のコマンドで確認できます。
+### ボリュームの使い方(2/2)
+
+* 任意の名称を指定  
+指定した名称のボリューム(**NamedVolume**)が作成されます。  
+NamedVolumeはホストOSからファイル操作ができないので、データを安全に保存することができます。  
+作成したNamedVolumeは以下のコマンドで確認できます。
 ```sh
 docker volume ls
 # 出力
 DRIVER              VOLUME NAME
 local               pg_data
 ```
-
-</dev>
 
 ---
 
@@ -292,108 +301,28 @@ local               pg_data
 
 以下の課題を通してDockerの基本操作を学びます。
 
-1. pgコンテナのログを表示する。
+* コンテナのログを表示する
 
-2. mnt-pgの/docker-entrypoint-initdb.d/initialize.sqlをホストOSにコピーする。
+* コンテナの任意のファイルをホストOSにコピーする
 
-3. initialize.sqlをpgコンテナの/tmpにコピーして実行する。  
-(実行コマンド：psql -U postgres -f /tmp/initialize.sql)
+* ホストOSで任意のファイルを作成し、コンテナへコピーする
 
-4. pgコンテナのbashを経由せずに、PostgreSQLにmyuserユーザーでmydbにログインする。
-(ログインコマンド：psql -U myuser mydb)
+* bashを経由せずに、コンテナのPostgreSQLにログインする
 
-5. pg、jp-pg、mnt-pgコンテナを停止、削除する。
+* pg、jp-pg、mnt-pgコンテナを停止・削除する
 
 ---
 
-### 基本操作(1/4)
+### 参考
 
-・ログの表示
+* リファレンス  
+Dockerコマンドのリファレンスは以下です。  
+<a href="http://docs.docker.jp/engine/reference/commandline/index.html">Dockerコマンド</a>
 
-```sh
-# ログを表示してプロンプトに戻る
-docker logs [コンテナ名]
-# プロンプトに戻らずログを表示し続ける(Ctrl+cで停止)
-dokcer logs -f [コンテナ名]
-```
-
-・コンテナでのコマンド実行
-
-```sh
-# コマンドを実行してプロンプトに戻る
-docker exec [コンテナ名] [実行コマンド]
-# bash/psql等のターミナルを操作
-docker exec -it [コンテナ名] [ターミナル]
-```
-
----
-
-### 基本操作(2/4)
-
-・作成済みコンテナの起動
-
-```sh
-docker start [コンテナ名]
-```
-
-・起動中コンテナの停止
-
-```sh
-docker stop [コンテナ名]
-```
-
-・停止中コンテナの削除
-
-```sh
-docker rm [コンテナ名]
-```
-
----
-
-### 基本操作(3/4)
-
-・ファイルコピー
-
-```sh
-# ホストOSからコンテナへコピー
-docker cp [ファイルパス] [コンテナ名]:[コピー先ディレクトリ]
-# コンテナからホストOSへコピー
-docker cp [コンテナ名]:[ファイルパス] [コピー先ディレクトリ]
-```
-
-・イメージの確認
-
-```sh
-docker images
-```
-
-・イメージ削除
-
-```sh
-docker rmi [イメージ名]
-```
-
----
-
-### 基本操作(4/4)
-
-・ボリューム確認
-
-```sh
-docker volume ls
-```
-
-・ボリュームを指定して削除
-
-```sh
-docker volume rm [ボリューム名]
-```
-
-・ヘルプを表示
-
+* ヘルプ  
+以下コマンドでDockerコマンドのヘルプを表示できます。
 ```sh
 docker help
-docker [Management Commands] help
 ```
 
 ---
@@ -408,39 +337,52 @@ docker [Management Commands] help
 
 ---
 
-### コンテナの用途
-
-コンテナは以下の用途で使用できます。
+### コンテナの用途(1/3)
 
 * サーバー  
-ここまでで触ってきたようにコンテナをサーバーとして運用することができます。
-コンテナを削除すると保存したデータも削除されますが、ボリュームを使用することでデータを永続化できます。
-
-* 単独処理  
-dokcer runに**--rm**オプションを追加すると、コマンド終了時にコンテナを削除することができます。
-このオプションを利用することで、コンテナ単独での処理が可能です。
+前述の通り、コンテナとはサーバーです。  
+用途に応じたイメージを作成することで、サーバーを簡単に構築できます。
+また、ボリュームを使用することで、コンテナ・ホストOS間でのファイルのやり取りや、
+データを永続化することができます。
 
 ---
 
-### 単独処理の例
+### コンテナの用途(2/3)
 
+* バッチ  
+コンテナを使用してバッチ処理ができます。
 以下のコマンドを実行してください。
 
 ```sh
-# Windows
-docker run --rm -v pg_data:/target -v %cd%:/backup postgres tar cfz /backup/pg_data.tar.gz -C /target .
-dir pg_data.tar.gz
+# Docker Desktop for Windows(Windows Pro)
+docker run --rm -v pg_data:/pg_data -v %cd%:/backup postgres cp -r /pg_data /backup/.
+start pg_data
 
-# Mac
-docker run --rm -v pg_data:/target -v ${PWD}:/backup postgres tar cfz /backup/pg_data.tar.gz -C /target .
-ls pg_data.tar.gz
+# Docker Toolbox(Windows Home)
+docker run --rm -v pg_data:/pg_data -v ${HOME}:/backup postgres cp -r /pg_data /backup/.                                
+start ${HOME}/pg_data
+
+# Docker Desktop for Mac
+docker run --rm -v pg_data:/pg_data -v ${PWD}:/backup postgres cp -r /pg_data /backup/.
+open pg_data
 
 # 共通：コマンド完了後
 docker ps -a
 ```
 
-pg_dataボリュームのデータをバックアップすることができました。
-別の端末にバックアップをコピーしてコンテナでマウントすることで、同一の環境を構築することができます。
+---
+
+### コンテナの用途(3/3)
+
+pg_dataボリュームのデータをホストOSにコピーすることができました。
+先のコマンド例の詳細は以下の通りです。
+
+* pg_dataボリュームをコンテナ:/pg_dataにマウント
+* ホストOS:カレントディレクトリをコンテナ:/backupにマウント
+* コンテナで/pg_dataを/backupの下に再帰コピー  
+(cp -r /pg_data /backup/.)
+* コマンド終了時にコンテナを削除  
+(docker runに--rmオプションを指定)
 
 ---
 
@@ -478,10 +420,10 @@ jp-pgコンテナにログインすることができます。
 
 ### Docker Composeとは
 
-前述の連携環境はPostgreSQL、phpPgAdminのコンテナを個別に起動しました。
+PostgreSQL, phpPgAdminの連携環境を作成しましたが、dockerコマンドでは各コンテナを個別に起動する必要があります。
 
-**Compose**を使用することで複数のコンテナを一括で起動することができます。
-同様の連携環境をComposeで構築することで、Composeの構築方法を学びます。
+dockerには、複数のコンテナを管理する**Compose**というツールがあります。
+Composeを使用することで、複数コンテナの連携環境を1コマンドで起動・停止できます。
 
 ---
 
@@ -498,7 +440,7 @@ services:
     image: postgres
     volumes:
       - pg_data:/var/lib/postgresql/data
-    port:
+    ports:
       - 5432:5432
 
 volumes:
@@ -511,87 +453,51 @@ volumes:
 
 ---
 
-### Composeの基本コマンド(1/2)
-
-docker-compose.ymlのあるディレクトリで、以下コマンドを実行するとComposeを操作できます。
-
-・Composeの起動
-
-```sh
-docker-compose up -d
-```
-
-・Composeの停止
-
-```sh
-docker-compose stop
-```
-
-・作成済みComposeの起動
-
-```sh
-docker-compose start
-```
-
-・コンテナの確認
-
-```sh
-docker-compose ps
-```
-
----
-
-### Composeの基本コマンド(2/2)
-
-その他のコマンドは、以下のヘルプと
-<a href="http://docs.docker.jp/compose/reference/overview.html">docker-composeコマンド概要</a>
-を参照してください。
-
-・ヘルプを表示
-
-```sh
-docker-compose help
-```
-
----
-
 ## ハンズオン
 ## Composeの作成
 
 ---
 
-### ハンズオンの事前準備
+### 事前準備
 
-以下コマンドでPostgreSQL、phpPgAdminのコンテナを停止・削除してください。
+pgadmin, jp-pgコンテナを停止して、pgadmin, jp-pgコンテナとpg_dataボリュームを削除してください。
 
 ```sh
 docker stop pgadmin jp-pg
 docker rm pgadmin jp-pg
+docker volume rm pg_data
 ```
 
 ---
 
 ### 課題
 
-<div style="font-size:0.9em;">
-
-以下のComposeを作成してください。
+以下の連携環境をComposeで作成してください。
 
 * PostgreSQL
- * jp-pgのDockerfileからイメージを作成して起動する
- * initdb/initialize.sqlを起動時に実行する
- * /var/lib/postgresql/dataにNamedVolumeをマウントする
+ * ホストOSで任意の初期化SQLを作成して、PostgreSQLコンテナ起動時に実行する  
+ (初期化SQL実行ディレクトリ：/docker-entrypoint-initdb.d)
+ * /var/lib/postgres/dataにNamedVolumeをマウントする
 
 * phpPgAdmin
- * dockage/phppgadminからコンテナを作成
- * PostgreSQLの起動を待って起動する
- * jp-pgコンテナの5432ポートに接続する
- * 80ポートでアクセス可能とする
+ * 上記PostgreSQLと連携する
 
-作成できたらブラウザで<a href="http://localhost">http://localhost</a>にアクセスして、
-myuserでPostgreSQLにログインできることを確認してください。
+環境ができたら、ブラウザでphpPgAdminにアクセスし、初期化SQLが実行されたことを確認してください。
 
-</div>
+---
+
+### 参考
+
+* リファレンス  
+Composeファイル、docker-composeコマンドのリファレンスは以下です。  
+<a href="http://docs.docker.jp/compose/compose-file.html">Composeファイル・リファレンス</a>  
+<a href="http://docs.docker.jp/compose/reference/overview.html">docker-composeコマンド概要</a>
+
+* ヘルプ  
+以下コマンドでdocker-composeコマンドのヘルプを表示できます。
+```sh
+docker-compose help
+```
 
 ---
 
@@ -608,29 +514,17 @@ myuserでPostgreSQLにログインできることを確認してください。
 ### まとめ
 
 * Dockerの構成要素
- * イメージからコンテナを構築してサーバーとして運用
- * コンテナにボリュームをマウントすることでデータを永続化
-* コンテナでできること
- * サーバーとして運用可能
- * オプションの指定で単独処理が可能
-* Dockerfileを用意することで独自のイメージを作成できる
-* Composeにより、複数コンテナが連携するDockerアプリケーションを作成できる
+ * コンテナ：サーバー
+ * イメージ：インストールメディア
+ * ボリューム：外付け記憶媒体
+* コンテナの用途
+ * サーバー
+ * バッチ処理
+* Composeで複数のコンテナを管理
  * 弊社プロダクト[sit-ds](https://github.com/sitoolkit/sit-ds)もComposeで実装
  * Jenkins, Redmine, Gitbucket, Sonarqube, Artifactoryのアセット
- * 各種アプリケーションサーバーはLDAP認証 + SelfServicePasswordでPW一括管理
- * バックアップ・リストアをDocker単独処理で実現
-
----
-
-### 付録：各種リファレンスへのリンク
-
-<a href="http://docs.docker.jp/engine/reference/commandline/index.html">Dockerコマンド</a>
-
-<a href="http://docs.docker.jp/engine/reference/builder.html">Dockerfileリファレンス</a>
-
-<a href="http://docs.docker.jp/compose/compose-file.html">Composeファイル・リファレンス</a>
-
-<a href="http://docs.docker.jp/compose/reference/overview.html">docker-composeコマンド概要</a>
+ * 各種アプリケーションサーバーはLDAP認証 + SelfServicePasswordでアカウントを管理
+ * バックアップ・リストアをバッチ処理で実装
 
 ---
 
