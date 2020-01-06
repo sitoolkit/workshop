@@ -101,18 +101,18 @@ vue create vue-project
 ```sh
 ? Please pick a preset:
   default (babel, eslint)
-❯ Manually select features
+> Manually select features
 
 ? Check the features needed for your project:
- ◉ Babel
- ◉ TypeScript
- ◯ Progressive Web App (PWA) Support
- ◉ Router
- ◯ Vuex
- ◉ CSS Pre-processors
- ◉ Linter / Formatter
- ◯ Unit Testing
- ◯ E2E Testing
+ (*) Babel
+ (*) TypeScript
+ ( ) Progressive Web App (PWA) Support
+ (*) Router
+ ( ) Vuex
+ (*) CSS Pre-processors
+ (*) Linter / Formatter
+ ( ) Unit Testing
+ ( ) E2E Testing
 ```
 
 以降の個別の選択では全てデフォルトを選択してください。
@@ -214,18 +214,18 @@ Chrome が起動し、上記の位置で処理が一時停止します。
 
 開発サーバーを使用するとsrcディレクトリ以下の変更は即座にブラウザに反映されます。(LiveReload機能)
 
-Home.vueの以下の2行をコメントアウトして保存します。
+Home.vueの以下の1行をコメントアウトして保存します。
 
 ```xml
 <template>
   <div class="home">
-    <!-- <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/> -->
+    <!-- <img alt="Vue logo" src="../assets/logo.png"> -->
+    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
   </div>
 </template>
 ```
 
-**ターミナル**ビューにトランスパイルのログが出力され、ブラウザは自動的に再描画されて変更後の状態が表示されます。(上記の変更ではVue.jsのロゴ以下が消えます。)
+**ターミナル**ビューにトランスパイルのログが出力され、ブラウザは自動的に再描画されて変更後の状態が表示されます。(上記の変更ではVue.jsのロゴが消えます。)
 
 ---
 
@@ -245,7 +245,8 @@ vue-project             // プロジェクトルート
 │   ├── components      // コンポーネントのvueファイルを配置するディレクトリ
 │   │   └── HelloWorld.vue
 │   ├── main.ts         // プロジェクトで最初に処理されるファイル
-│   ├── router.ts       // 画面のパスを定義するファイル
+│   ├── router
+│   │   └── index.ts   // 画面のパスを定義するファイル
 │   └── views           // 画面のvueファイルを配置するディレクトリ
 │       ├── About.vue
 │       └── Home.vue
@@ -289,9 +290,11 @@ new Vue({
 
 ---
 
-### router.ts
+### router/index.ts
 
-router.ts は画面の vue クラスを
+<div style="font-size:0.8em;">
+
+router/index.ts は画面の vue クラスを
 <a href="https://router.vuejs.org/ja/" target="vue-router">vue-router</a>
 を使用して vue クラスのパスを定義します。
 
@@ -299,27 +302,34 @@ router.ts は画面の vue クラスを
 import Vue from 'vue';
 import Router from 'vue-router';
 // 画面のvueクラスをimport
-import Home from './views/Home.vue';
+import Home from '../views/Home.vue'
 
 Vue.use(Router);
 
-export default new Router({
+const routes = [
+  {
+    path: '/',       // vueクラスのパスを定義
+    name: 'home',
+    component: Home
+  },
+  :
+const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes: [
-    {
-      path: '/',       // vueクラスのパスを定義
-      name: 'home',
-      component: Home,
-    },
+  routes
+})
 ```
 
 ここで定義されたパスにブラウザでアクセスすると、
 vue コンポーネントの描画結果が表示されます。
 
+</div>
+
 ---
 
 ### vue ファイル
+
+<div style="font-size:0.8em;">
 
 template タグ内に"HTML の原型"を実装します。
 
@@ -347,6 +357,8 @@ export default class View extends Vue {
 </script>
 
 ```
+
+</div>
 
 ---
 
