@@ -26,16 +26,15 @@ title: Docker入門ハンズオン
 
 **このワークショップでは**
 
-Dockerを使用したことがない方へ、Dockerの基本的な使い方から、
-Dockerアプリケーションの作成方法まで、ハンズオン形式で解説します。
+Dockerの基本的な使い方から実践的な使い方までをハンズオン形式で解説します。
+
+**対象者**
+
+Dockerを使ったことがない人
 
 **前提知識**
 
-Windows 又は MacでCLI操作ができること
-
----
-
-## 環境の準備
+コマンドプロンプト(Windows) / ターミナル(macOS) の基本的な操作方法
 
 ---
 
@@ -45,15 +44,31 @@ Windows 又は MacでCLI操作ができること
 
 * Docker
  * Windows Home  
-   [Docker Toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/)  
+   <a href="https://docs.docker.com/toolbox/toolbox_install_windows/" target="docker-toolbox">Docker Toolbox</a>
  * Windows Pro  
-   [Docker Desktop for Windows](https://docs.docker.com/docker-for-windows/install/)
+   <a href="https://docs.docker.com/docker-for-windows/install/" target="docker-desktop-win">Docker Desktop for Windows</a>
  * Mac  
-   [Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/install/)  
+   <a href="https://docs.docker.com/docker-for-mac/install/" target="docker-desktop-mac">Docker Desktop for Mac</a>
 
-* [Visual Studio Code](https://code.visualstudio.com/)
+* <a href="https://code.visualstudio.com/" target="vscode">Visual Studio Code</a>
 
 ---
+
+### 表記
+
+本書では「以下のコマンドを実行してください」と表記することがあります。
+その場合は、以下の通りOSごとのコマンドラインツールで記載された実行してください。
+
+* Windows Home  
+  Docker Quickstart Terminal
+* Windows Pro  
+  コマンドプロンプト
+* macOS  
+  ターミナル
+
+
+---
+
 
 ## Dockerの構成要素
 
@@ -61,10 +76,15 @@ Windows 又は MacでCLI操作ができること
 
 ### コンテナを動かす
 
-Docker Quickstart Terminal(Windows Home) / コマンドプロンプト(Windows Pro) / ターミナル(macOS)で以下のコマンドを実行してください。
+以下のコマンドを実行してください。
+
+
 
 ```sh
+
 docker run -d --name pg postgres
+
+
 ```
 
 これで、DockerでPostgreSQLサーバーが起動しました。
@@ -111,7 +131,7 @@ c715a39f1989        postgres            "docker-entrypoint.s…"   8 minutes ago
 
 ### イメージの作成(1/3)
 
-前述の**docker run**コマンドは<a href="https://hub.docker.com/_/postgres">Docker Hub</a>
+前述の**docker run**コマンドは<a href="https://hub.docker.com/_/postgres" target="postgres-dockerhub">Docker Hub</a>
 で公開されているPostgreSQLの**Dockerイメージ**でコンテナを起動しています。
 
 **Dockerイメージ**は公開されているイメージをカスタマイズして作ることもできます。
@@ -135,9 +155,12 @@ code Dockerfile
 VSCodeがDockerfileを開いたら以下の内容を貼り付けてください。
 
 ```docker
+
 FROM postgres
 RUN localedef -i ja_JP -c -f UTF-8 -A /usr/share/locale/locale.alias ja_JP.UTF-8
 ENV LANG ja_JP.utf8
+
+
 ```
 
 ---
@@ -147,7 +170,10 @@ ENV LANG ja_JP.utf8
 Dockerfileを保存し、以下のコマンドを実行してください。
 
 ```sh
+
 docker build -t jp-pg .
+
+
 ```
 
 これで、**ロケールを日本に変更したPostgreSQL**のイメージが作成できました。
@@ -159,7 +185,10 @@ docker build -t jp-pg .
 以下のコマンドでコンテナを起動してください。
 
 ```sh
+
 docker run -d --name jp-pg jp-pg
+
+
 ```
 
 コンテナが起動したら、以下のコマンドを実行してください。
@@ -203,9 +232,12 @@ postgres            latest              9eb7b0ce936d        2 days ago          
 
 
 ```sh
+
 cd ..
 mkdir initdb
 code initdb/initialize.sql
+
+
 ```
 
 ---
@@ -215,10 +247,15 @@ code initdb/initialize.sql
 VSCodeがinitialize.sqlを開いたら以下の内容を貼り付けてください。
 
 ```sql
+
 CREATE USER myuser;
 CREATE DATABASE mydb;
 GRANT ALL PRIVILEGES ON DATABASE mydb TO myuser;
+
+
 ```
+
+このSQLスクリプトは上から順に、ユーザーの作成、DBの作成、作成したユーザーにDBへの全権限の付与を行います。
 
 ---
 
@@ -317,12 +354,16 @@ local               pg_data
 
 * リファレンス  
 Dockerコマンドのリファレンスは以下です。  
-<a href="http://docs.docker.jp/engine/reference/commandline/index.html">Dockerコマンド</a>
+<a href="http://docs.docker.jp/engine/reference/commandline/index.html" target="docker-command">Dockerコマンド</a>
 
 * ヘルプ  
 以下コマンドでDockerコマンドのヘルプを表示できます。
+
 ```sh
+
 docker help
+
+
 ```
 
 ---
@@ -396,11 +437,14 @@ Dockerでは複数のコンテナを連携することができます。
 以下のコマンドで、PostgreSQL、phpPgAdminを起動してください。
 
 ```sh
+
 docker run -d --name jp-pg jp-pg
 docker run -d --name pgadmin -p 80:80 --link jp-pg:jp-pg -e PHP_PG_ADMIN_SERVER_HOST="jp-pg" -e PHP_PG_ADMIN_SERVER_PORT=5432 dockage/phppgadmin
+
+
 ```
 
-ブラウザで<a href="http://localhost">http://localhost</a>にアクセスすると、phpPgAdminが表示できます。
+ブラウザで<a href="http://localhost" target="phppgadmin">http://localhost</a>にアクセスすると、phpPgAdminが表示できます。
 
 ---
 
@@ -448,7 +492,7 @@ volumes:
 ```
 
 上記内容の詳細と、他に記述できる内容は
-<a href="http://docs.docker.jp/compose/compose-file.html">Composeファイル・リファレンス</a>
+<a href="http://docs.docker.jp/compose/compose-file.html" target="compose-file">Composeファイル・リファレンス</a>
 を参照してください。
 
 ---
@@ -460,12 +504,17 @@ volumes:
 
 ### 事前準備
 
-pgadmin, jp-pgコンテナを停止して、pgadmin, jp-pgコンテナとpg_dataボリュームを削除してください。
+これまでのハンズオンで作成したコンテナ、ボリュームを削除します。
+
+以下のコマンドを実行し、pgadmin, jp-pgコンテナを停止し、pgadmin, jp-pgコンテナとpg_dataボリュームを削除してください。
 
 ```sh
+
 docker stop pgadmin jp-pg
 docker rm pgadmin jp-pg
 docker volume rm pg_data
+
+
 ```
 
 ---
@@ -490,13 +539,17 @@ docker volume rm pg_data
 
 * リファレンス  
 Composeファイル、docker-composeコマンドのリファレンスは以下です。  
-<a href="http://docs.docker.jp/compose/compose-file.html">Composeファイル・リファレンス</a>  
-<a href="http://docs.docker.jp/compose/reference/overview.html">docker-composeコマンド概要</a>
+<a href="http://docs.docker.jp/compose/compose-file.html" target="compose-file">Composeファイル・リファレンス</a>  
+<a href="http://docs.docker.jp/compose/reference/overview.html" target="compose-overview">docker-composeコマンド概要</a>
 
 * ヘルプ  
 以下コマンドでdocker-composeコマンドのヘルプを表示できます。
+
 ```sh
+
 docker-compose help
+
+
 ```
 
 ---
@@ -514,17 +567,15 @@ docker-compose help
 ### まとめ
 
 * Dockerの構成要素
- * コンテナ：サーバー
- * イメージ：インストールメディア
- * ボリューム：外付け記憶媒体
+ * コンテナ：コマンドで起動するサーバー
+ * イメージ：Dockerfileで定義インストールメディア
+ * ボリューム：コンテナの外付け記憶媒体
 * コンテナの用途
  * サーバー
  * バッチ処理
-* Composeで複数のコンテナを管理
- * 弊社プロダクト[sit-ds](https://github.com/sitoolkit/sit-ds)もComposeで実装
- * Jenkins, Redmine, Gitbucket, Sonarqube, Artifactoryのアセット
- * 各種アプリケーションサーバーはLDAP認証 + SelfServicePasswordでアカウントを管理
- * バックアップ・リストアをバッチ処理で実装
+* Compose
+  * docker-compose.ymlで複数のコンテナを組み合わせて使用
+  * 使用例：<a href="https://github.com/sitoolkit/sit-ds/" target="sit-ds">SI-Toolkit Dev Servers</a> 
 
 ---
 
