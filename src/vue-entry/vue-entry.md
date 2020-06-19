@@ -26,9 +26,9 @@ Vue.js を使って SPA が作成できるようになること
 
 ### 目次
 
-- 開発環境の構築
-  - 必要なソフトウェアのインストール
-  - 開発ツールの設定
+- 必要なソフトウェア
+- Vueアプリケーションの作成
+- Vue CLI ツールによるシステム開発
 - プロジェクト構成の把握
   - ディレクトリ構成
   - ファイルの種類
@@ -39,11 +39,7 @@ Vue.js を使って SPA が作成できるようになること
 
 ---
 
-## 開発環境の構築
-
----
-
-### 必要なソフトウェア (1/2)
+### 必要なソフトウェア
 
 ハンズオンでは以下のソフトウェアを使用します。
 リンク先のガイダンスに従い各ソフトウェアをインストールして下さい。
@@ -57,11 +53,326 @@ Vue.js を使って SPA が作成できるようになること
 
 ---
 
-### 必要なソフトウェア (2/2)
+## Vueアプリケーションの作成
 
-Vue.js SPA 開発用 CLI ツールをインストールします。
+---
 
-コマンドプロンプト(Windows) / ターミナル(macOS)で以下のコマンドを実行してください。
+### Vueアプリケーションの作成 (1/2)
+
+HTMLファイルで動作するVueアプリケーションを作成します。  
+以下コマンドを実行してください。
+
+```sh
+
+cd /path/to/your/workspace
+code .
+
+
+```
+
+code コマンドが有効化されていない場合は、VSCode を手動で起動し、
+**ファイル**メニュー＞**開く**から上記の workspace フォルダを選択してください。
+
+以降の説明は特に断りのない限り VSCode の操作です。
+
+---
+
+### Vueアプリケーションの作成 (2/2)
+
+<div style="font-size:0.8em;">
+
+**workspace**フォルダ直下に**index.html**ファイルを作成し、以下の内容を貼り付けて保存します。
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Vue.js入門</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      {{ message }}
+    </div>
+
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+          message: 'Vue.js 入門',
+        },
+      });
+    </script>
+  </body>
+</html>
+```
+
+ブラウザでindex.htmlを開いてください。
+メッセージが表示されているだけのシンプルな画面ですが、Vueアプリケーションとして動作しています。
+
+</div>
+
+---
+
+### 宣言的レンダリング (1/2)
+
+ブラウザのJavaScriptコンソールを開いて、コンソールに以下を入力してください。
+(例：chrome - F12押下 > "Console"タブ)
+
+```javascript
+app.message = "Vue.js ハンズオン"
+```
+
+コンソールで入力した内容でページが更新されます。  
+レンダリングする対象を宣言することで、リアクティブなDOMレンダリングが行われます。
+
+---
+
+### 宣言的レンダリング (2/2)
+
+<div style="font-size:0.8em;">
+
+**v-bind**ディレクティブを使用することで、属性にも適用できます。
+以下内容をindex.htmlのbody部に貼り付けてブラウザを更新してください。
+
+```html
+    <div id="app">
+      <span v-bind:title="title">
+        {{ message }}
+      </span>
+    </div>
+
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+          title: '宣言的レンダリング',
+          message: 'Vue.js 入門',
+        },
+      });
+    </script>
+```
+
+"Vue.js 入門"にカーソルを合わせると、"宣言的レンダリング"が表示されます。
+JavaScriptコンソールでapp.titleを変更するとページに反映されます。
+
+</div>
+
+---
+
+### 条件分岐とループ (1/2)
+
+<div style="font-size:0.8em;">
+
+**v-if**ディレクティブを使用と要素の表示・非表示を切り替えることができます。
+以下内容をindex.htmlのbody部に貼り付けてブラウザを更新してください。
+
+```html
+    <div id="app">
+      <span v-if="display">
+        {{ message }}
+      </span>
+    </div>
+
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+          display: true,
+          message: 'Vue.js 入門',
+        },
+      });
+    </script>
+```
+
+JavaScriptコンソールで app.display=false を入力すると"Vue.js 入門"が非表示になります。
+
+</div>
+
+
+---
+
+### 条件分岐とループ (2/2)
+
+<div style="font-size:0.7em;">
+
+**v-for**ディレクティブでループ処理が実行できます。
+ループ処理を使用することで、リストやテーブルなど繰り返し表示する要素を簡単に実装できます。
+以下内容をindex.htmlのbody部に貼り付けてブラウザを更新してください。
+
+```html
+    <div id="app">
+      <ol>
+        <li v-for="content in contents">
+          {{ content.text }}
+        </li>
+      </ol>
+    </div>
+
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+          contents: [
+            { text: "Vue.js 入門" },
+            { text: "宣言的レンダリング" },
+          ],
+        },
+      });
+    </script>
+```
+
+JavaScriptコンソールで app.contents.push({ text: "条件分岐トループ" }) を入力すると、リストに新しい項目が追加されます。
+
+</div>
+
+---
+
+### ユーザー入力の制御 (1/2)
+
+<div style="font-size:0.8em;">
+
+ユーザーからの入力は**v-on**でイベントリスナーを作成することで制御できます。
+以下内容をindex.htmlのbody部に貼り付けてブラウザを更新してください。
+
+```html
+    <div id="app">
+      <p>クリック回数: {{ clickTimes }}</p>
+      <button v-on:click="count">increment</button>
+    </div>
+
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+          clickTimes: 0
+        },
+        methods: {
+          count: function() {
+            this.clickTimes++;
+          },
+        },
+      });
+    </script>
+```
+
+"increment"ボタンでcountメソッドを実行し、クリック回数をカウントします。
+
+</div>
+
+---
+
+### ユーザー入力の制御 (2/2)
+
+<div style="font-size:0.8em;">
+
+**v-model**ディレクティブを使用することで、
+ユーザーからの入力とアプリケーションの状態を双方向でバインドすることができます。
+以下内容をindex.htmlのbody部に貼り付けてブラウザを更新してください。
+
+```html
+    <div id="app">
+      <p>{{ message }}</p>
+      <input v-model="message">
+    </div>
+
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+          message: "Vue.js 入門",
+        },
+      });
+    </script>
+```
+
+入力フォームの内容を変更すると、画面表示も更新されます。
+
+</div>
+
+---
+
+### コンポーネントによる構成 (1/2)
+
+Vue.jsは画面の要素を**コンポーネント**として再利用・組み合わせて使用することができます。
+以下内容をindex.htmlのbody部に貼り付けてブラウザを更新してください。
+
+```html
+    <div id="app">
+      <p>{{ message }}</p>
+      <component-item />
+    </div>
+
+    <script>
+      Vue.component('component-item', {
+        template: '<h3>コンポーネントによる表示</h3>',
+      });
+
+      var app = new Vue({
+        el: '#app',
+        data: {
+          message: "Vue.js 入門",
+        },
+      });
+    </script>
+```
+
+---
+
+### コンポーネントによる構成 (2/2)
+
+<div style="font-size:0.8em;">
+
+ここまでで使用してきた、v-bindやv-forなどのディレクティブもコンポーネントに使用できます。
+以下内容をindex.htmlのbody部に貼り付けてブラウザを更新してください。
+
+```html
+    <div id="app">
+      <p>{{ message }}</p>
+      <list-component
+        v-for="content in contents"
+        v-bind:content="content"
+        v-bind:key="content.id"/>
+    </div>
+
+    <script>
+      Vue.component('list-component', {
+        props: [ 'content' ],
+        template: '<li>{{ content.text }}</li>',
+      });
+
+      var app = new Vue({
+        el: '#app',
+        data: {
+          message: "Vue.js 入門",
+          contents: [
+            { id: 0, text: "宣言的レンダリング" },
+            { id: 1, text: "条件分岐とループ" }
+          ],
+        },
+      });
+    </script>
+```
+
+</div>
+
+---
+
+## Vue CLI ツールによるシステム開発
+
+---
+
+### Vue CLI ツールのインストール
+
+ここまで単一のHTMLで動作するVueアプリケーションを作成しましたが、
+システムの規模が大きくなってくると、開発が困難になってきます。
+
+大規模システムを効率よく開発するために、Vue.js SPA 開発用 CLI ツールを使用します。
+
+ここからはCLIツールを使用した開発手法について学んでいきます。
+コマンドプロンプト(Windows) / ターミナル(macOS)で以下のコマンドを実行して、
+CLIツールをインストールしてください。
 
 ```sh
 
@@ -69,10 +380,6 @@ yarn global add @vue/cli
 
 
 ```
-
-補足: Vue.js はこの CLI 等を使わず、通常の HTML に組み込んで使うこともできます。使い方は
-<a href="https://jp.vuejs.org/v2/guide/installation.html#lt-script-gt-%E7%9B%B4%E6%8E%A5%E7%B5%84%E3%81%BF%E8%BE%BC%E3%81%BF" target="_blank" >こちら</a>
-を参照してください。
 
 ---
 
@@ -584,6 +891,8 @@ yarn serve
 
 ### まとめ
 
+- Vueアプリケーションは単一のHTMLで実装できる
+- Vue CLIツールを使用することで効率よく開発できる
 - Vue 実装時に使用するファイルの種類は vue, ts(js)
 - main.ts はプロジェクト実行時の開始地点
 - router.ts はパスのマッピングを設定
