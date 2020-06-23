@@ -58,6 +58,8 @@ Vue.js を使って SPA が作成できるようになること
 
 Visual Studio Code（以降、VSCode）の拡張機能はCLIでインストールできます。
 
+コマンドプロンプト(Windows) / ターミナル(macOS)で以下のコマンドを実行してください。
+
 ```sh
 code --install-extension msjsdiag.debugger-for-chrome
 code --install-extension mubaidr.vuejs-extension-pack
