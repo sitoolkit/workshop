@@ -50,6 +50,7 @@ Vue.js を使って SPA が作成できるようになること
 - <a href="https://code.visualstudio.com/" target="Visual Studio Code">Visual Studio Code</a>
   - <a href="https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome" target="Debugger for Chrome">Debugger for Chrome</a>
   - <a href="https://marketplace.visualstudio.com/items?itemName=mubaidr.vuejs-extension-pack" target="Vue.js Extension Pack">Vue.js Extension Pack</a>
+  - <a href="https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer" target="Live Server">Live Server</a>
 
 ---
 
@@ -108,7 +109,7 @@ code コマンドが有効化されていない場合は、VSCode を手動で�
 </html>
 ```
 
-ブラウザでindex.htmlを開いてください。
+Live Serverでindex.htmlを開いてください。
 メッセージが表示されているだけのシンプルな画面ですが、Vueアプリケーションとして動作しています。
 
 </div>
@@ -117,14 +118,15 @@ code コマンドが有効化されていない場合は、VSCode を手動で�
 
 ### 宣言的レンダリング (1/2)
 
-ブラウザのJavaScriptコンソールを開いて、コンソールに以下を入力してください。
-(例：chrome - F12押下 > "Console"タブ)
+VSCodeでmessageを以下の通り変更してください。  
 
 ```javascript
-app.message = "Vue.js ハンズオン"
+        data: {
+          message: 'Vue.js ハンズオン',
+        },
 ```
 
-コンソールで入力した内容でページが更新されます。  
+変更した内容でページが更新されます。  
 レンダリングする対象を宣言することで、リアクティブなDOMレンダリングが行われます。
 
 ---
@@ -134,7 +136,7 @@ app.message = "Vue.js ハンズオン"
 <div style="font-size:0.8em;">
 
 **v-bind**ディレクティブを使用することで、属性にも適用できます。
-以下内容をindex.htmlのbody部に貼り付けてブラウザを更新してください。
+以下内容をindex.htmlのbody部に貼り付けてください。
 
 ```html
     <div id="app">
@@ -154,208 +156,71 @@ app.message = "Vue.js ハンズオン"
     </script>
 ```
 
-"Vue.js 入門"にカーソルを合わせると、"宣言的レンダリング"が表示されます。
-JavaScriptコンソールでapp.titleを変更するとページに反映されます。
+ページが更新されて、"Vue.js 入門"にカーソルを合わせると、"宣言的レンダリング"が表示されます。
+VSCodeでtitleを変更するとページに反映されます。
 
 </div>
 
 ---
 
-### 条件分岐とループ (1/2)
-
-<div style="font-size:0.8em;">
-
-**v-if**ディレクティブを使用と要素の表示・非表示を切り替えることができます。
-以下内容をindex.htmlのbody部に貼り付けてブラウザを更新してください。
-
-```html
-    <div id="app">
-      <span v-if="display">
-        {{ message }}
-      </span>
-    </div>
-
-    <script>
-      var app = new Vue({
-        el: '#app',
-        data: {
-          display: true,
-          message: 'Vue.js 入門',
-        },
-      });
-    </script>
-```
-
-JavaScriptコンソールで app.display=false を入力すると"Vue.js 入門"が非表示になります。
-
-</div>
-
-
----
-
-### 条件分岐とループ (2/2)
+### 条件分岐とループ
 
 <div style="font-size:0.7em;">
 
-**v-for**ディレクティブでループ処理が実行できます。
-ループ処理を使用することで、リストやテーブルなど繰り返し表示する要素を簡単に実装できます。
-以下内容をindex.htmlのbody部に貼り付けてブラウザを更新してください。
+Vue.jsでは条件分岐・ループ処理でコンテンツの表示を制御することができます。
 
-```html
-    <div id="app">
-      <ol>
-        <li v-for="content in contents">
-          {{ content.text }}
-        </li>
-      </ol>
-    </div>
+条件分岐・ループ処理を使って、以下のページを実装してください。
 
-    <script>
-      var app = new Vue({
-        el: '#app',
-        data: {
-          contents: [
-            { text: "Vue.js 入門" },
-            { text: "宣言的レンダリング" },
-          ],
-        },
-      });
-    </script>
-```
+* ループ処理を使用して以下のテーブルを表示する
 
-JavaScriptコンソールで app.contents.push({ text: "条件分岐トループ" }) を入力すると、リストに新しい項目が追加されます。
+|ID |Name  |
+|---|------|
+|001|Tanaka|
+|002|Tamura|
+|003|Nakata|
+
+* 条件分岐を使って、行の表示・非表示を制御する  
+
+実装できたら、Live Serverでページを表示、
+ソースを編集して行の表示・非表示を切り替えて動作を確認してください。
+
+**参考**
+
+<a href="https://jp.vuejs.org/v2/guide/#%E6%9D%A1%E4%BB%B6%E5%88%86%E5%B2%90%E3%81%A8%E3%83%AB%E3%83%BC%E3%83%97" target="_blank">条件分岐とループ</a>
 
 </div>
 
 ---
 
-### ユーザー入力の制御 (1/2)
+### ユーザー入力の制御
 
 <div style="font-size:0.8em;">
 
-ユーザーからの入力は**v-on**でイベントリスナーを作成することで制御できます。
-以下内容をindex.htmlのbody部に貼り付けてブラウザを更新してください。
+Webアプリケーションはボタン押下やフォームの入力等、ユーザーの入力に応じて動作します。
+Vue.jsでは**v-on**・**v-model**ディレクティブを使用することで、ユーザー入力の制御を簡単に実装することができます。
 
-```html
-    <div id="app">
-      <p>クリック回数: {{ clickTimes }}</p>
-      <button v-on:click="count">increment</button>
-    </div>
+"条件分岐とループ"で実装したテーブルに以下機能を追加してください。
 
-    <script>
-      var app = new Vue({
-        el: '#app',
-        data: {
-          clickTimes: 0
-        },
-        methods: {
-          count: function() {
-            this.clickTimes++;
-          },
-        },
-      });
-    </script>
-```
+* フォームに名前を入力してボタンを押すとテーブルにユーザーを追加する
 
-"increment"ボタンでcountメソッドを実行し、クリック回数をカウントします。
+* 同一の名前は登録しないように制御する
 
-</div>
+**参考**
+
+<a href="https://jp.vuejs.org/v2/guide/#%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E5%85%A5%E5%8A%9B%E3%81%AE%E5%88%B6%E5%BE%A1" target="_blank">ユーザー入力の制御</a>
 
 ---
 
-### ユーザー入力の制御 (2/2)
-
-<div style="font-size:0.8em;">
-
-**v-model**ディレクティブを使用することで、
-ユーザーからの入力とアプリケーションの状態を双方向でバインドすることができます。
-以下内容をindex.htmlのbody部に貼り付けてブラウザを更新してください。
-
-```html
-    <div id="app">
-      <p>{{ message }}</p>
-      <input v-model="message">
-    </div>
-
-    <script>
-      var app = new Vue({
-        el: '#app',
-        data: {
-          message: "Vue.js 入門",
-        },
-      });
-    </script>
-```
-
-入力フォームの内容を変更すると、画面表示も更新されます。
-
-</div>
-
----
-
-### コンポーネントによる構成 (1/2)
+### コンポーネントによる構成
 
 Vue.jsは画面の要素を**コンポーネント**として再利用・組み合わせて使用することができます。
-以下内容をindex.htmlのbody部に貼り付けてブラウザを更新してください。
+ここまでで使用してきた条件分岐・ループ・ユーザー入力の制御もコンポーネントに適用することができます。
 
-```html
-    <div id="app">
-      <p>{{ message }}</p>
-      <component-item />
-    </div>
+作成したページの、テーブルの行・入力フォームをコンポーネントで実装してください。
 
-    <script>
-      Vue.component('component-item', {
-        template: '<h3>コンポーネントによる表示</h3>',
-      });
+**参考**
 
-      var app = new Vue({
-        el: '#app',
-        data: {
-          message: "Vue.js 入門",
-        },
-      });
-    </script>
-```
-
----
-
-### コンポーネントによる構成 (2/2)
-
-<div style="font-size:0.8em;">
-
-ここまでで使用してきた、v-bindやv-forなどのディレクティブもコンポーネントに使用できます。
-以下内容をindex.htmlのbody部に貼り付けてブラウザを更新してください。
-
-```html
-    <div id="app">
-      <p>{{ message }}</p>
-      <list-component
-        v-for="content in contents"
-        v-bind:content="content"
-        v-bind:key="content.id"/>
-    </div>
-
-    <script>
-      Vue.component('list-component', {
-        props: [ 'content' ],
-        template: '<li>{{ content.text }}</li>',
-      });
-
-      var app = new Vue({
-        el: '#app',
-        data: {
-          message: "Vue.js 入門",
-          contents: [
-            { id: 0, text: "宣言的レンダリング" },
-            { id: 1, text: "条件分岐とループ" }
-          ],
-        },
-      });
-    </script>
-```
-
-</div>
+<a href="https://jp.vuejs.org/v2/guide/#%E3%82%B3%E3%83%B3%E3%83%9D%E3%83%BC%E3%83%8D%E3%83%B3%E3%83%88%E3%81%AB%E3%82%88%E3%82%8B%E6%A7%8B%E6%88%90" target="_blank">コンポーネントによる構成</a>
 
 ---
 
