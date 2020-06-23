@@ -54,6 +54,26 @@ Vue.js を使って SPA が作成できるようになること
 
 ---
 
+### Visual Studio Code - 拡張機能
+
+Visual Studio Code（以降、VSCode）の拡張機能はCLIでインストールできます。
+
+```sh
+code --install-extension msjsdiag.debugger-for-chrome
+code --install-extension mubaidr.vuejs-extension-pack
+code --install-extension ritwickdey.LiveServer
+```
+
+上記コマンドは code コマンドが有効化されている必要があります。
+
+有効化されていない場合はVSCodeを手動で起動、以下ショートカットでEXTENSIONSメニューを表示して
+必要な拡張機能をインストールしてください。
+
+* Windows : ctl + shift + x
+* macOS : command + shift + x
+
+---
+
 ## Vueアプリケーションの作成
 
 ---
@@ -116,50 +136,22 @@ Live Serverでindex.htmlを開いてください。
 
 ---
 
-### 宣言的レンダリング (1/2)
+### 宣言的レンダリング
 
-VSCodeでmessageを以下の通り変更してください。  
+Vue.jsではデータとDOMが関連付けられデータが更新されるとリアクティブに描画が更新されます。
 
-```javascript
-        data: {
-          message: 'Vue.js ハンズオン',
-        },
-```
+以下のページをVue.jsアプリケーションで実装してください。
 
-変更した内容でページが更新されます。  
-レンダリングする対象を宣言することで、リアクティブなDOMレンダリングが行われます。
+* dataで宣言されたメッセージを表示する
 
----
+* メッセージをマウスオーバーするとツールチップを表示する
 
-### 宣言的レンダリング (2/2)
+実装できたら、Live Serverでページを表示、
+dataを変更して表示が更新されることを確認してください。
 
-<div style="font-size:0.8em;">
+**参考**
 
-**v-bind**ディレクティブを使用することで、属性にも適用できます。
-以下内容をindex.htmlのbody部に貼り付けてください。
-
-```html
-    <div id="app">
-      <span v-bind:title="title">
-        {{ message }}
-      </span>
-    </div>
-
-    <script>
-      var app = new Vue({
-        el: '#app',
-        data: {
-          title: '宣言的レンダリング',
-          message: 'Vue.js 入門',
-        },
-      });
-    </script>
-```
-
-ページが更新されて、"Vue.js 入門"にカーソルを合わせると、"宣言的レンダリング"が表示されます。
-VSCodeでtitleを変更するとページに反映されます。
-
-</div>
+<a href="https://jp.vuejs.org/v2/guide/#%E5%AE%A3%E8%A8%80%E7%9A%84%E3%83%AC%E3%83%B3%E3%83%80%E3%83%AA%E3%83%B3%E3%82%B0" target="_blank">宣言的レンダリング</a>
 
 ---
 
