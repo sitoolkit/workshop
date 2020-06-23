@@ -71,7 +71,7 @@ code --install-extension ritwickdey.LiveServer
 有効化されていない場合はVSCodeを手動で起動、以下ショートカットでEXTENSIONSメニューを表示して
 必要な拡張機能をインストールしてください。
 
-* Windows : ctl + shift + x
+* Windows : ctrl + shift + x
 * macOS : command + shift + x
 
 ---
