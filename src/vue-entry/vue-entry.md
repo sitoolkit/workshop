@@ -26,9 +26,9 @@ Vue.js を使って SPA が作成できるようになること
 
 ### 目次
 
-- 開発環境の構築
-  - 必要なソフトウェアのインストール
-  - 開発ツールの設定
+- 必要なソフトウェア
+- Vueアプリケーションの作成
+- Vue CLI ツールによるシステム開発
 - プロジェクト構成の把握
   - ディレクトリ構成
   - ファイルの種類
@@ -39,11 +39,7 @@ Vue.js を使って SPA が作成できるようになること
 
 ---
 
-## 開発環境の構築
-
----
-
-### 必要なソフトウェア (1/2)
+### 必要なソフトウェア
 
 ハンズオンでは以下のソフトウェアを使用します。
 リンク先のガイダンスに従い各ソフトウェアをインストールして下さい。
@@ -54,14 +50,188 @@ Vue.js を使って SPA が作成できるようになること
 - <a href="https://code.visualstudio.com/" target="Visual Studio Code">Visual Studio Code</a>
   - <a href="https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome" target="Debugger for Chrome">Debugger for Chrome</a>
   - <a href="https://marketplace.visualstudio.com/items?itemName=mubaidr.vuejs-extension-pack" target="Vue.js Extension Pack">Vue.js Extension Pack</a>
+  - <a href="https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer" target="Live Server">Live Server</a>
 
 ---
 
-### 必要なソフトウェア (2/2)
+### Visual Studio Code - 拡張機能
 
-Vue.js SPA 開発用 CLI ツールをインストールします。
+Visual Studio Code（以降、VSCode）の拡張機能はCLIでインストールできます。
 
 コマンドプロンプト(Windows) / ターミナル(macOS)で以下のコマンドを実行してください。
+
+```sh
+code --install-extension msjsdiag.debugger-for-chrome
+code --install-extension mubaidr.vuejs-extension-pack
+code --install-extension ritwickdey.LiveServer
+```
+
+上記コマンドは code コマンドが有効化されている必要があります。
+
+有効化されていない場合はVSCodeを手動で起動、以下ショートカットでEXTENSIONSメニューを表示して
+必要な拡張機能をインストールしてください。
+
+* Windows : ctrl + shift + x
+* macOS : command + shift + x
+
+---
+
+## Vueアプリケーションの作成
+
+---
+
+### Vueアプリケーションの作成 (1/2)
+
+HTMLファイルで動作するVueアプリケーションを作成します。  
+以下コマンドを実行してください。
+
+```sh
+
+cd /path/to/your/workspace
+code .
+
+
+```
+
+code コマンドが有効化されていない場合は、VSCode を手動で起動し、
+**ファイル**メニュー＞**開く**から上記の workspace フォルダを選択してください。
+
+以降の説明は特に断りのない限り VSCode の操作です。
+
+---
+
+### Vueアプリケーションの作成 (2/2)
+
+<div style="font-size:0.8em;">
+
+**workspace**フォルダ直下に**index.html**ファイルを作成し、以下の内容を貼り付けて保存します。
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Vue.js入門</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      {{ message }}
+    </div>
+
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+          message: 'Vue.js 入門',
+        },
+      });
+    </script>
+  </body>
+</html>
+```
+
+Live Serverでindex.htmlを開いてください。
+メッセージが表示されているだけのシンプルな画面ですが、Vueアプリケーションとして動作しています。
+
+</div>
+
+---
+
+### 宣言的レンダリング
+
+Vue.jsではデータとDOMが関連付けられデータが更新されるとリアクティブに描画が更新されます。
+
+以下のページをVue.jsアプリケーションで実装してください。
+
+* dataで宣言されたメッセージを表示する
+
+* メッセージをマウスオーバーするとツールチップを表示する
+
+実装できたら、Live Serverでページを表示、
+dataを変更して表示が更新されることを確認してください。
+
+**参考**
+
+<a href="https://jp.vuejs.org/v2/guide/#%E5%AE%A3%E8%A8%80%E7%9A%84%E3%83%AC%E3%83%B3%E3%83%80%E3%83%AA%E3%83%B3%E3%82%B0" target="_blank">宣言的レンダリング</a>
+
+---
+
+### 条件分岐とループ
+
+<div style="font-size:0.7em;">
+
+Vue.jsでは条件分岐・ループ処理でコンテンツの表示を制御することができます。
+
+条件分岐・ループ処理を使って、以下のページを実装してください。
+
+* ループ処理を使用して以下のテーブルを表示する
+
+|ID |Name  |
+|---|------|
+|001|Tanaka|
+|002|Tamura|
+|003|Nakata|
+
+* 条件分岐を使って、行の表示・非表示を制御する  
+
+実装できたら、Live Serverでページを表示、
+ソースを編集して行の表示・非表示を切り替えて動作を確認してください。
+
+**参考**
+
+<a href="https://jp.vuejs.org/v2/guide/#%E6%9D%A1%E4%BB%B6%E5%88%86%E5%B2%90%E3%81%A8%E3%83%AB%E3%83%BC%E3%83%97" target="_blank">条件分岐とループ</a>
+
+</div>
+
+---
+
+### ユーザー入力の制御
+
+<div style="font-size:0.8em;">
+
+Webアプリケーションはボタン押下やフォームの入力等、ユーザーの入力に応じて動作します。
+Vue.jsでは**v-on**・**v-model**ディレクティブを使用することで、ユーザー入力の制御を簡単に実装することができます。
+
+"条件分岐とループ"で実装したテーブルに以下機能を追加してください。
+
+* フォームに名前を入力してボタンを押すとテーブルにユーザーを追加する
+
+* 同一の名前は登録しないように制御する
+
+**参考**
+
+<a href="https://jp.vuejs.org/v2/guide/#%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E5%85%A5%E5%8A%9B%E3%81%AE%E5%88%B6%E5%BE%A1" target="_blank">ユーザー入力の制御</a>
+
+---
+
+### コンポーネントによる構成
+
+Vue.jsは画面の要素を**コンポーネント**として再利用・組み合わせて使用することができます。
+ここまでで使用してきた条件分岐・ループ・ユーザー入力の制御もコンポーネントに適用することができます。
+
+作成したページの、テーブルの行・入力フォームをコンポーネントで実装してください。
+
+**参考**
+
+<a href="https://jp.vuejs.org/v2/guide/#%E3%82%B3%E3%83%B3%E3%83%9D%E3%83%BC%E3%83%8D%E3%83%B3%E3%83%88%E3%81%AB%E3%82%88%E3%82%8B%E6%A7%8B%E6%88%90" target="_blank">コンポーネントによる構成</a>
+
+---
+
+## Vue CLI ツールによるシステム開発
+
+---
+
+### Vue CLI ツールのインストール
+
+ここまで単一のHTMLで動作するVueアプリケーションを作成しましたが、
+システムの規模が大きくなってくると、開発が困難になってきます。
+
+大規模システムを効率よく開発するために、Vue.js SPA 開発用 CLI ツールを使用します。
+
+ここからはCLIツールを使用した開発手法について学んでいきます。
+コマンドプロンプト(Windows) / ターミナル(macOS)で以下のコマンドを実行して、
+CLIツールをインストールしてください。
 
 ```sh
 
@@ -69,10 +239,6 @@ yarn global add @vue/cli
 
 
 ```
-
-補足: Vue.js はこの CLI 等を使わず、通常の HTML に組み込んで使うこともできます。使い方は
-<a href="https://jp.vuejs.org/v2/guide/installation.html#lt-script-gt-%E7%9B%B4%E6%8E%A5%E7%B5%84%E3%81%BF%E8%BE%BC%E3%81%BF" target="_blank" >こちら</a>
-を参照してください。
 
 ---
 
@@ -584,6 +750,8 @@ yarn serve
 
 ### まとめ
 
+- Vueアプリケーションは単一のHTMLで実装できる
+- Vue CLIツールを使用することで効率よく開発できる
 - Vue 実装時に使用するファイルの種類は vue, ts(js)
 - main.ts はプロジェクト実行時の開始地点
 - router.ts はパスのマッピングを設定
