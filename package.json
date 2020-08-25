@@ -1,0 +1,15 @@
+{
+  "name": "workshop",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/sitoolkit/workshop.git",
+  "author": "Yuichi Kuwahara <yuichi.kuwahara.0@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "serve": "reveal-md src -w",
+    "builc": "reveal-md src --static docs"
+  },
+  "devDependencies": {
+    "reveal-md": "^4.1.3"
+  }
+}

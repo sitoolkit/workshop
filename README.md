@@ -1,11 +1,13 @@
 ## 動かし方
 
 ```sh
-yarn global add reveal-md
+git clone https://github.com/sitoolkit/workshop.git
+cd workshop
+yarn install
 
 # 編集時のプレビュー用コマンド
-reveal-md src -w
+yarn serve
 
-# GitHubPagesに公開用コマンド
-reveal-md src --static docs
+# 公開用資材の生成コマンド
+yarn build
 ```
