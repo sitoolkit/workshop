@@ -1,22 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-
-    <title>コード駆動設計</title>
-    <link rel="stylesheet" href=".\../dist/reveal.css" />
-    <link rel="stylesheet" href=".\../dist/theme/white.css" id="theme" />
-    <link rel="stylesheet" href=".\../css/highlight/vs2015.css" />
-    <link rel="stylesheet" href=".\../_assets/src/css/sitoolkit.css" />
-
-  </head>
-  <body>
-    <div class="reveal">
-      <div class="slides"><section  data-markdown><script type="text/template">
+---
+title: コード駆動設計
+---
 
 # コード駆動設計
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 目次
 
 - はじめに
@@ -27,7 +16,9 @@
 - Code Visualizer でコード駆動設計を実践
 - まとめ
 - 補足
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### はじめに
 
 **このワークショップでは**
@@ -40,9 +31,13 @@
 UML(シーケンス図、クラス図)が読めること
 
 Java を用いた Web アプリケーション開発の経験
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## 環境の準備
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ソフトウェアのインストール
 
 ハンズオンでは以下のソフトウェアが必要です。
@@ -57,11 +52,15 @@ Java を用いた Web アプリケーション開発の経験
 
 それぞれリンク先のガイダンスに従いダウンロード・インストールしてください。
 Maven は mvn コマンドが有効となるように環境変数の設定まで実施してください。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## Code Visualizer の使い方
 
 ### ソースコードを読む
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### CV を動かす
 
 コマンドプロプト(Windows) / ターミナル(macOS)で以下のコマンドを実行してください。
@@ -84,7 +83,9 @@ java -jar sit-cv-app-1.0.0-beta.5-exec.jar
 ```
 
 ブラウザが起動し CV が生成したページが表示されます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 解説
 
 CV は、プロジェクト内の java ファイルを解析して
@@ -95,7 +96,9 @@ CV は、プロジェクト内の java ファイルを解析して
 というドメイン駆動設計(Domain Driven Design, DDD)のサンプル実装のプロジェクトです。
 
 プロジェクト内には貨物の航路情報を管理する Web アプリケーションが実装されています。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### CV が生成するシーケンス図
 
 <div style="font-size:0.7em;">
@@ -109,14 +112,18 @@ CV は、プロジェクト内の java ファイルを解析して
 <div>
 
 <img src="sequence-diagram.png"/>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### CV が生成するシーケンス図
 
 シーケンス図にライフラインとして描画されるクラスは、
 デフォルトの設定では **Service**、**Repository**、**Factory**、**Specification** クラスです。
 
 これらは**ドメイン駆動設計**で提唱された振る舞いを担う主要なステレオタイプです。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### CV が生成するクラス図
 
 <div style="font-size:0.8em;">
@@ -129,7 +136,9 @@ CV が生成するシーケンス図の下にはクラス図が表示されま�
 </div>
 
 <img src="class-diagram.png"/>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### その他の CV の機能
 
 **Live Reload**
@@ -149,9 +158,13 @@ open docs/designdoc/index.html # macOS
 ```
 
 出力されたファイルは GitHub Pages や Web サーバーにホスト出来ます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## ドメイン駆動設計
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ドメイン駆動設計 要約 (1/3)
 
 ドメイン駆動設計は、システムのドメイン(業務領域や専門分野)の概念・用語を設計・実装に反映させることで
@@ -160,7 +173,9 @@ open docs/designdoc/index.html # macOS
 ドメインロジックの設計・実装を業務の表現に近づけるための
 クラス分類や責務割当の方法についても言及されています。
 
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ドメイン駆動設計 要約 (2/3)
 
 ドメイン駆動設計の重要な指針に、クラスの責務をステレオタイプによって分類するというものがあります。
@@ -178,7 +193,9 @@ open docs/designdoc/index.html # macOS
 | Specification  | 業務仕様で定められた判定ロジック              |
 
 </div>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ドメイン駆動設計 要約 (3/3)
 
 ステレオタイプをクラスとして実装する際の配置・単位はおよそ以下の様になります。
@@ -195,7 +212,9 @@ open docs/designdoc/index.html # macOS
 | Specification  | domain      | 業務仕様     | 業務仕様              |
 
 </div>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ドメイン駆動設計と Code Visualizer
 
 ドメイン駆動設計や他の一般的な設計手法では、
@@ -204,9 +223,13 @@ open docs/designdoc/index.html # macOS
 その結果、ソースコードから**処理全体の流れがわかりにくく**なることもあります。
 
 CV を使うと、この分散した実装を一**連の処理として可視化して俯瞰**することが出来ます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## コード駆動設計
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### コード駆動設計
 
 コード駆動設計(Code Driven Desing, CDD)はソースコードで処理設計をするという手法です。
@@ -214,7 +237,9 @@ CV を使うと、この分散した実装を一**連の処理として可視化
 ソースコードを適切に可視化することで**設計書の作成・保守コストの削減**を図ります。
 
 また、オブジェクト間の相互作用で処理全体を設計するため**ソースコードの可読性の向上**が期待できます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### コード駆動設計
 
 ソースコードの基本的な実装順序とドメイン駆動設計で該当するステレオタイプは以下の通りです。
@@ -227,7 +252,9 @@ CV を使うと、この分散した実装を一**連の処理として可視化
    - Repository、Factory、Specification
 
 この作業を、画面仕様やデータモデルを精緻化させながら繰り返します。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### コード駆動設計 作業の流れ(1/3)
 
 例として、オンラインストアの注文を確定する処理を実装します。
@@ -240,7 +267,9 @@ CV を使うと、この分散した実装を一**連の処理として可視化
 2. 画面に「注文を受け付けました。」というメッセージと「注文番号」が表示される。
 
 これをドメイン駆動設計に従ってコード駆動設計します。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### コード駆動設計 作業の流れ(2/3)
 
 OrderService クラスと order メソッドを実装します。
@@ -262,7 +291,9 @@ public class OrderService {
 
 注文を確定するので、注文情報を DB に保存するための Repository の呼び出しを実装します。
 注文番号を採番したいのですが、ここでは TODO としておきます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### コード駆動設計 作業の流れ(3/3)
 
 OrderServcie.order メソッドの実装で、新たに OrderEntity と OrderRepository が登場したので実装します。
@@ -284,11 +315,15 @@ public class OrderRepository {
 ```
 
 Repository のメソッドの内部は実装せずに、TODO タグを書いておきます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## Code Visualizer で
 
 ## コード駆動設計を実践
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 題材 (1/3)
 
 CV を使って以下の機能を設計・実装します。
@@ -309,7 +344,9 @@ CV を使って以下の機能を設計・実装します。
 <p style="font-size:0.6em;text-align:left;">
 前提　この時点でユーザーはカートへの商品追加、および送付先住所・支払方法の入力をしているものとします。
 <p>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 題材 (2/3)
 
 **仕様**
@@ -321,7 +358,9 @@ CV を使って以下の機能を設計・実装します。
 - 支払方法はクレジットカード、代金引換が選択できる。
   - クレジットカードの場合は外部サービス(REST API)を呼び出して決済する。
 
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 題材 (3/3)
 
 **データモデル**
@@ -331,7 +370,9 @@ CV を使って以下の機能を設計・実装します。
 <img src="./data-model.png"/>
 
 これら以外のテーブル・仕様も実際のオンラインストアの運営を想定しながら自由に設計してみてください。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 作業の流れ
 
 1. プロジェクト作成
@@ -344,7 +385,9 @@ Controller、Service のみメソッドの中身を実装します。
 
 Factory、Specivication はメソッドのシグニチャのみを実装し、
 期待する振る舞いを Javadoc に記載します。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### プロジェクト作成 (1/2)
 
 以下のコマンドを実行します。
@@ -363,7 +406,9 @@ mkdir -p src/main/java/a/b/c
 ```
 
 以降ではsrc/main/java/a/b/c以下に必要なJavaパッケージ、クラスを作成するものとします。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### プロジェクト作成 (2/2)
 
 cdd-projectディレクトリにpom.xmlファイルを作成し、以下の内容を貼り付けて保存します。
@@ -384,7 +429,9 @@ cdd-projectディレクトリにpom.xmlファイルを作成し、以下の内�
 
 </project>
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### Code Visualizer のインストール・起動
 
 以下のコマンドを実行します。
@@ -404,7 +451,9 @@ java -jar sit-cv-app-1.0.0-beta.5-exec.jar
 ```
 
 ブラウザが開き、Code Visualizer のページが表示されます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### REST API の実装
 
 CV でエントリーポイントとなる Controller から実装します。
@@ -428,19 +477,27 @@ public class OrderController {
 ```
 OrderRequestDto・OrderResponseDtoはREST APIのリクエスト・レスポンスのデータを格納するクラスです。
 これらのクラスも同一パッケージ内に作成してください。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## それでは
 
 ## 作業を始めてください
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## まとめ
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### まとめ
 
 * CVは処理全体を**主要クラス間のメッセージのやり取り**として可視化します。
 * この視点は**クラスの責務割当**や**メソッドのシグニチャ**の妥当性を判断するためにとても重要です。
 * コード駆動設計はこれらを**メソッドの中身を実装する前に最適化**を試みるアプローチです。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 補足　CRUD マトリクス
 
 CV は起動時に--cv.analyze-sql オプションを付与すると、
@@ -466,59 +523,9 @@ java -jar sit-cv-app-1.0.0-beta.5-exec.jar --cv.analyze-sql
 <p>
 
 </div>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ご清聴ありがとうございました。
 
 ### ハンズオンお疲れさまでした。
-</script></section></div>
-    </div>
-
-    <script src=".\../dist/reveal.js"></script>
-
-    <script src=".\../plugin/markdown/markdown.js"></script>
-    <script src=".\../plugin/highlight/highlight.js"></script>
-    <script src=".\../plugin/zoom/zoom.js"></script>
-    <script src=".\../plugin/notes/notes.js"></script>
-    <script src=".\../plugin/math/math.js"></script>
-    <script>
-      function extend() {
-        var target = {};
-        for (var i = 0; i < arguments.length; i++) {
-          var source = arguments[i];
-          for (var key in source) {
-            if (source.hasOwnProperty(key)) {
-              target[key] = source[key];
-            }
-          }
-        }
-        return target;
-      }
-
-      // default options to init reveal.js
-      var defaultOptions = {
-        controls: true,
-        progress: true,
-        history: true,
-        center: true,
-        transition: 'default', // none/fade/slide/convex/concave/zoom
-        plugins: [
-          RevealMarkdown,
-          RevealHighlight,
-          RevealZoom,
-          RevealNotes,
-          RevealMath
-        ]
-      };
-
-      // options from URL query string
-      var queryOptions = Reveal().getQueryHash() || {};
-
-      var options = extend(defaultOptions, {"transition":"fade","slideNumber":true}, queryOptions);
-    </script>
-
-
-    <script>
-      Reveal.initialize(options);
-    </script>
-  </body>
-</html>

@@ -1,24 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-
-    <title>Vue.js入門</title>
-    <link rel="stylesheet" href=".\../dist/reveal.css" />
-    <link rel="stylesheet" href=".\../dist/theme/white.css" id="theme" />
-    <link rel="stylesheet" href=".\../css/highlight/vs2015.css" />
-    <link rel="stylesheet" href=".\../_assets/src/css/sitoolkit.css" />
-
-  </head>
-  <body>
-    <div class="reveal">
-      <div class="slides"><section  data-markdown><script type="text/template">
+---
+title: Vue.js入門
+---
 
 # Vue.js 入門
 
 # ハンズオン
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### このハンズオンは
 
 **対象者**
@@ -32,7 +21,9 @@ HTML、CSS、JavaScript、Java 等のオブジェクト指向言語の基礎
 **目標**
 
 Vue.js を使って SPA が作成できるようになること
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 目次
 
 - 必要なソフトウェア
@@ -45,7 +36,9 @@ Vue.js を使って SPA が作成できるようになること
   - 体裁の実装
   - イベントハンドラの実装
   - 画面遷移の実装
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 必要なソフトウェア
 
 ハンズオンでは以下のソフトウェアを使用します。
@@ -58,7 +51,9 @@ Vue.js を使って SPA が作成できるようになること
   - <a href="https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome" target="Debugger for Chrome">Debugger for Chrome</a>
   - <a href="https://marketplace.visualstudio.com/items?itemName=mubaidr.vuejs-extension-pack" target="Vue.js Extension Pack">Vue.js Extension Pack</a>
   - <a href="https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer" target="Live Server">Live Server</a>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### Visual Studio Code - 拡張機能
 
 Visual Studio Code（以降、VSCode）の拡張機能はCLIでインストールできます。
@@ -78,9 +73,13 @@ code --install-extension ritwickdey.LiveServer
 
 * Windows : ctrl + shift + x
 * macOS : command + shift + x
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## Vueアプリケーションの作成
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### Vueアプリケーションの作成 (1/2)
 
 HTMLファイルで動作するVueアプリケーションを作成します。  
@@ -98,7 +97,9 @@ code コマンドが有効化されていない場合は、VSCode を手動で�
 **ファイル**メニュー＞**開く**から上記の workspace フォルダを選択してください。
 
 以降の説明は特に断りのない限り VSCode の操作です。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### Vueアプリケーションの作成 (2/2)
 
 <div style="font-size:0.8em;">
@@ -111,7 +112,7 @@ code コマンドが有効化されていない場合は、VSCode を手動で�
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Vue.js入門</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js">__SCRIPT_END__
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   </head>
   <body>
     <div id="app">
@@ -125,7 +126,7 @@ code コマンドが有効化されていない場合は、VSCode を手動で�
           message: 'Vue.js 入門',
         },
       });
-    __SCRIPT_END__
+    </script>
   </body>
 </html>
 ```
@@ -134,7 +135,9 @@ Live Serverでindex.htmlを開いてください。
 メッセージが表示されているだけのシンプルな画面ですが、Vueアプリケーションとして動作しています。
 
 </div>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 宣言的レンダリング
 
 Vue.jsではデータとDOMが関連付けられデータが更新されるとリアクティブに描画が更新されます。
@@ -151,7 +154,9 @@ dataを変更して表示が更新されることを確認してください。
 **参考**
 
 <a href="https://jp.vuejs.org/v2/guide/#%E5%AE%A3%E8%A8%80%E7%9A%84%E3%83%AC%E3%83%B3%E3%83%80%E3%83%AA%E3%83%B3%E3%82%B0" target="_blank">宣言的レンダリング</a>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 条件分岐とループ
 
 <div style="font-size:0.7em;">
@@ -178,7 +183,9 @@ Vue.jsでは条件分岐・ループ処理でコンテンツの表示を制御�
 <a href="https://jp.vuejs.org/v2/guide/#%E6%9D%A1%E4%BB%B6%E5%88%86%E5%B2%90%E3%81%A8%E3%83%AB%E3%83%BC%E3%83%97" target="_blank">条件分岐とループ</a>
 
 </div>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ユーザー入力の制御
 
 <div style="font-size:0.8em;">
@@ -195,7 +202,9 @@ Vue.jsでは**v-on**・**v-model**ディレクティブを使用することで�
 **参考**
 
 <a href="https://jp.vuejs.org/v2/guide/#%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E5%85%A5%E5%8A%9B%E3%81%AE%E5%88%B6%E5%BE%A1" target="_blank">ユーザー入力の制御</a>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### コンポーネントによる構成
 
 Vue.jsは画面の要素を**コンポーネント**として再利用・組み合わせて使用することができます。
@@ -206,9 +215,13 @@ Vue.jsは画面の要素を**コンポーネント**として再利用・組み�
 **参考**
 
 <a href="https://jp.vuejs.org/v2/guide/#%E3%82%B3%E3%83%B3%E3%83%9D%E3%83%BC%E3%83%8D%E3%83%B3%E3%83%88%E3%81%AB%E3%82%88%E3%82%8B%E6%A7%8B%E6%88%90" target="_blank">コンポーネントによる構成</a>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## Vue CLI ツールによるシステム開発
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### Vue CLI ツールのインストール
 
 ここまで単一のHTMLで動作するVueアプリケーションを作成しましたが、
@@ -226,7 +239,9 @@ yarn global add @vue/cli
 
 
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### プロジェクト作成 1/2
 
 Vue.js のプロジェクトを作成します。
@@ -242,7 +257,9 @@ vue create vue-project
 ```
 
 コマンドを実行するとプロジェクトの設定を選択する対話モードが始まります。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### プロジェクト作成 2/2
 
 対話モードで**Manually select features**を選択し、以下の feature を選択してください。
@@ -265,7 +282,9 @@ vue create vue-project
 ```
 
 以降の個別の選択では全てデフォルトを選択してください。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### プロジェクトを開く
 
 プロジェクト作成が終了したら、以下のコマンドを実行し VSCode でプロジェクトを開きます。
@@ -281,7 +300,9 @@ code コマンドが有効化されていない場合は、VSCode を手動で�
 **ファイル**メニュー＞**開く**から上記の vue-project フォルダを選択してください。
 
 以降の説明は特に断りのない限り VSCode の操作です。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### デバッグの設定 1/2
 
 **vue-project**フォルダ直下に**vue.config.js**ファイルを作成し、
@@ -294,7 +315,9 @@ module.exports = {
   }
 };
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### デバッグの設定 2/2
 
 **vue-project**フォルダに**.vscode**フォルダを作成し、
@@ -319,7 +342,9 @@ module.exports = {
   ]
 }
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 開発サーバーの起動
 
 1. **ターミナル**メニュー＞**新しいターミナル**を選択します。
@@ -335,7 +360,9 @@ yarn serve
 開発サーバーが起動し、
 <a href="http://localhost:8080" target="vue-project">http://localhost:8080</a>
 で vue-project にアクセスできるようになります。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### デバッグの開始
 
 **src/main.ts**ファイルを開き、
@@ -346,7 +373,9 @@ yarn serve
 **デバッグ**メニュー＞**デバッグの開始**を選択します。
 
 Chrome が起動し、上記の位置で処理が一時停止します。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### LiveReload
 
 開発サーバーを使用するとsrcディレクトリ以下の変更は即座にブラウザに反映されます。(LiveReload機能)
@@ -363,9 +392,13 @@ Home.vueの以下の1行をコメントアウトして保存します。
 ```
 
 **ターミナル**ビューにトランスパイルのログが出力され、ブラウザは自動的に再描画されて変更後の状態が表示されます。(上記の変更ではVue.jsのロゴが消えます。)
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## プロジェクト構成の把握
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ディレクトリ構成
 
 Vue プロジェクトの主要なディレクトリとファイルは以下のものです。
@@ -384,7 +417,9 @@ vue-project             // プロジェクトルート
 │       ├── About.vue
 │       └── Home.vue
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ファイルの種類
 
 - vue ファイル
@@ -395,7 +430,9 @@ vue-project             // プロジェクトルート
   - TypeScript で実装
 
 **補足** Vue.js は TypeScript を使用せず JavaScript で実装することもできます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### main.ts
 
 main.ts はプロジェクトのエントリーポイントとなるファイルです。
@@ -416,7 +453,9 @@ new Vue({
   render: h => h(App)
 }).$mount("#app");
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### router/index.ts
 
 <div style="font-size:0.8em;">
@@ -451,7 +490,9 @@ const router = new VueRouter({
 vue コンポーネントの描画結果が表示されます。
 
 </div>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### vue ファイル
 
 <div style="font-size:0.8em;">
@@ -479,12 +520,14 @@ export default class View extends Vue {
     console.log(this.field);
   }
 }
-__SCRIPT_END__
+</script>
 
 ```
 
 </div>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### App.vue
 
 App.vue はルートとなる vue コンポーネントです。
@@ -507,9 +550,13 @@ App.vue やその子コンポーネントに組み込んで使用します。
   :
 </style>
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 # 標準機能の把握
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 画面の実装
 
 実際に画面を実装しながら Vue.js の標準機能を理解します。
@@ -521,7 +568,9 @@ App.vue やその子コンポーネントに組み込んで使用します。
 
 HTMLはこのサンプルのものを使ってもよいです。
 サンプルを開いたら**右クリック**＞**ページのソースを表示**を選択するとHTMLが表示されます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 実装ステップ
 
 以下の順に実装を進めます。
@@ -533,7 +582,9 @@ HTMLはこのサンプルのものを使ってもよいです。
 5. 詳細画面を実装
 
 各ステップでは Vue.js の標準ガイドや参考にしながら実装します。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### JavaScript Style と TypeScript Style
 
 当ハンズオンでは TypeScript を採用していますが、標準ガイドは JavaScript で記載されています。
@@ -556,7 +607,9 @@ export default class Example2 extends Vue {
   }
 }
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 検索条件の入力フォームを実装
 
 User Name テキストボックスと検索ボタンを実装します。
@@ -565,7 +618,9 @@ User Name テキストボックスと検索ボタンを実装します。
 **参考**
 
 <a href="https://jp.vuejs.org/v2/guide/forms.html" target="_blank">フォーム入力バインディング</a>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 検索ボタンのイベントハンドラを実装
 
 以下の挙動を実装します。
@@ -576,7 +631,9 @@ User Name テキストボックスと検索ボタンを実装します。
 **参考**
 
 <a href="https://jp.vuejs.org/v2/guide/events.html" target="_blank">イベントハンドリング</a>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 検索結果の一覧をダミーデータで実装
 
 Home クラスに以下の json データを持つフィールドを定義します。
@@ -594,7 +651,9 @@ Home クラスに以下の json データを持つフィールドを定義しま
 **参考**
 
 <a href="https://jp.vuejs.org/v2/guide/list.html" target="list">リストレンダリング</a>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ダミーデータをサーバーから取得して一覧に表示 1/4
 
 プロジェクト直下に db.json ファイルを作成し、以下の内容を貼り付けます。
@@ -608,7 +667,9 @@ Home クラスに以下の json データを持つフィールドを定義しま
   ]
 }
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ダミーデータをサーバーから取得して一覧に表示 2/4
 
 1. 新しいターミナルビューを起動します。
@@ -624,7 +685,9 @@ json-server --watch db.json
 
 3. ブラウザで <a href="http://localhost:3000/users" target="_blank">http://localhost:3000/users</a> を開きます。
 4. <a href="https://www.npmjs.com/package/json-server" target="_blank">json-server の使い方</a>を参考に、ダミーデータの検索ができることを確認します。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ダミーデータをサーバーから取得して一覧に表示 3/4
 
 1. 開発サーバーを停止します。
@@ -637,7 +700,9 @@ yarn serve
 
 
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ダミーデータをサーバーから取得して一覧に表示 4/4
 
 以下の挙動を実装します。
@@ -648,7 +713,9 @@ yarn serve
 **参考**
 
 <a href="https://github.com/axios/axios#example" target="axios">axios Example</a>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 詳細画面を実装 1/2
 
 詳細画面を実装し、検索画面からリンクを貼ります。
@@ -663,7 +730,9 @@ yarn serve
 **参考**
 
 <a href="https://router.vuejs.org/ja/guide/#html" target="router">Vue Router</a>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 詳細画面を実装
 
 1. router.ts でパスに動的セグメントを追加します。
@@ -676,7 +745,9 @@ yarn serve
 <a href="https://router.vuejs.org/ja/guide/essentials/dynamic-matching.html" target="dynamicroutematching">動的ルートマッチング</a>
 
 <a href="https://jp.vuejs.org/v2/guide/instance.html#%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%83%A9%E3%82%A4%E3%83%95%E3%82%B5%E3%82%A4%E3%82%AF%E3%83%AB%E3%83%95%E3%83%83%E3%82%AF" target="lifecyclehook">インスタンスライフサイクルフック</a>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### まとめ
 
 - Vueアプリケーションは単一のHTMLで実装できる
@@ -688,59 +759,9 @@ yarn serve
 - 「Vue Router」でコンポーネント中に別コンポーネントの埋め込みが可能
 - 「動的ルートマッチング」で URL をパターンマッチ認識可能
 - 「インスタンスライフサイクルフック」でインスタンス生成時に任意の処理が可能
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ご清聴ありがとうございました。
 
 ### ハンズオンお疲れさまでした。
-</script></section></div>
-    </div>
-
-    <script src=".\../dist/reveal.js"></script>
-
-    <script src=".\../plugin/markdown/markdown.js"></script>
-    <script src=".\../plugin/highlight/highlight.js"></script>
-    <script src=".\../plugin/zoom/zoom.js"></script>
-    <script src=".\../plugin/notes/notes.js"></script>
-    <script src=".\../plugin/math/math.js"></script>
-    <script>
-      function extend() {
-        var target = {};
-        for (var i = 0; i < arguments.length; i++) {
-          var source = arguments[i];
-          for (var key in source) {
-            if (source.hasOwnProperty(key)) {
-              target[key] = source[key];
-            }
-          }
-        }
-        return target;
-      }
-
-      // default options to init reveal.js
-      var defaultOptions = {
-        controls: true,
-        progress: true,
-        history: true,
-        center: true,
-        transition: 'default', // none/fade/slide/convex/concave/zoom
-        plugins: [
-          RevealMarkdown,
-          RevealHighlight,
-          RevealZoom,
-          RevealNotes,
-          RevealMath
-        ]
-      };
-
-      // options from URL query string
-      var queryOptions = Reveal().getQueryHash() || {};
-
-      var options = extend(defaultOptions, {"transition":"fade","slideNumber":true}, queryOptions);
-    </script>
-
-
-    <script>
-      Reveal.initialize(options);
-    </script>
-  </body>
-</html>

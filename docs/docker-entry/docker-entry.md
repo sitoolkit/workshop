@@ -1,24 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-
-    <title>Docker入門ハンズオン</title>
-    <link rel="stylesheet" href=".\../dist/reveal.css" />
-    <link rel="stylesheet" href=".\../dist/theme/white.css" id="theme" />
-    <link rel="stylesheet" href=".\../css/highlight/vs2015.css" />
-    <link rel="stylesheet" href=".\../_assets/src/css/sitoolkit.css" />
-
-  </head>
-  <body>
-    <div class="reveal">
-      <div class="slides"><section  data-markdown><script type="text/template">
+---
+title: Docker入門ハンズオン
+---
 
 # Docker入門
 
 # ハンズオン
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 目次
 
 - はじめに
@@ -30,7 +19,9 @@
 - Docker Compose
 - ハンズオン：Composeの作成
 - まとめ
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### はじめに
 
 **このワークショップでは**
@@ -44,7 +35,9 @@ Dockerを使ったことがない人
 **前提知識**
 
 コマンドプロンプト(Windows) / ターミナル(macOS) の基本的な操作方法
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 環境の準備
 
 ハンズオンでは以下のソフトウェアが必要です。
@@ -58,7 +51,9 @@ Dockerを使ったことがない人
    <a href="https://docs.docker.com/docker-for-mac/install/" target="docker-desktop-mac">Docker Desktop for Mac</a>
 
 * <a href="https://code.visualstudio.com/" target="vscode">Visual Studio Code</a>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 表記
 
 本書では「以下のコマンドを実行してください」と表記することがあります。
@@ -71,10 +66,14 @@ Dockerを使ったことがない人
 * macOS  
   ターミナル
 
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 
 ## Dockerの構成要素
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### コンテナを動かす
 
 以下のコマンドを実行してください。
@@ -89,7 +88,9 @@ docker run -d --name pg postgres
 ```
 
 これで、DockerでPostgreSQLサーバーが起動しました。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### コンテナの中に入る
 
 以下のコマンドを実行してください。
@@ -110,7 +111,9 @@ psql (12.1 (Debian 12.1-1.pgdg100+1))
 Type "help" for help.
 
 postgres=#
-```</script></section><section  data-markdown><script type="text/template">
+```
+---
+
 ### コンテナとは
 
 **コンテナ**とは、要するに**サーバー**です。
@@ -123,7 +126,9 @@ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
 c715a39f1989        postgres            "docker-entrypoint.s…"   8 minutes ago       Up 8 minutes        5432/tcp            pg
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### イメージの作成(1/3)
 
 前述の**docker run**コマンドは<a href="https://hub.docker.com/_/postgres" target="postgres-dockerhub">Docker Hub</a>
@@ -142,7 +147,9 @@ mkdir jp-pg
 cd jp-pg
 code Dockerfile
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### イメージの作成 (2/3)
 
 VSCodeがDockerfileを開いたら以下の内容を貼り付けてください。
@@ -155,7 +162,9 @@ ENV LANG ja_JP.utf8
 
 
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### イメージの作成 (3/3)
 
 Dockerfileを保存し、以下のコマンドを実行してください。
@@ -168,7 +177,9 @@ docker build -t jp-pg .
 ```
 
 これで、**ロケールを日本に変更したPostgreSQL**のイメージが作成できました。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 作成したイメージでコンテナを起動
 
 以下のコマンドでコンテナを起動してください。
@@ -194,7 +205,9 @@ postgres=#
 ```
 
 ログインメッセージが日本語になっています。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### イメージとは
 
 **イメージ**は、要するに**サーバーのインストールメディア**です。
@@ -208,7 +221,9 @@ REPOSITORY          TAG                 IMAGE ID            CREATED             
 jp-pg               latest              a78ef5e0a592        36 seconds ago      398MB
 postgres            latest              9eb7b0ce936d        2 days ago          394MB
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ボリュームのマウント(1/4)
 
 コンテナとホストOS間でファイルをやり取りするためには、**ボリューム**を使用します。
@@ -224,7 +239,9 @@ code initdb/initialize.sql
 
 
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ボリュームのマウント(2/4)
 
 VSCodeがinitialize.sqlを開いたら以下の内容を貼り付けてください。
@@ -239,7 +256,9 @@ GRANT ALL PRIVILEGES ON DATABASE mydb TO myuser;
 ```
 
 このSQLスクリプトは上から順に、ユーザーの作成、DBの作成、作成したユーザーにDBへの全権限の付与を行います。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ボリュームのマウント(3/4)
 
 initialize.sqlを保存し、以下のコマンドでコンテナを起動してください。
@@ -254,7 +273,9 @@ docker run -d --name mnt-pg -v ${HOME}/initdb:/docker-entrypoint-initdb.d -v pg_
 # ターミナル(macOS)
 docker run -d --name mnt-pg -v ${PWD}/initdb:/docker-entrypoint-initdb.d -v pg_data:/var/lib/postgresql/data jp-pg
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ボリュームのマウント(4/4)
 
 以下のコマンドを実行してください。
@@ -271,14 +292,18 @@ mydb=>
 ```
 
 ホストOSで作成した初期化SQLファイルがコンテナで実行されて、myuserでmydbにログインできます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ボリュームとは
 
 **ボリューム**とは、要するに**外付け記憶媒体**です。
 
 ボリュームをコンテナにマウント(接続)することで、
 コンテナ内に外部からデータを持ち込んだり、コンテナ内のデータを外部に持ち出すことができます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ボリュームの使い方(1/2)
 
 ボリュームをマウントするには、docker runに**"-v [ホストOSのパス or 任意の名称]:[コンテナのパス]"**オプションを指定します。
@@ -286,7 +311,9 @@ mydb=>
 * ホストOSのパスを指定  
 コンテナからホストOSのパスを参照することができます。  
 つまり、ホストOSとコンテナの共有ディレクトリのように使用することができます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ボリュームの使い方(2/2)
 
 * 任意の名称を指定  
@@ -299,10 +326,14 @@ docker volume ls
 DRIVER              VOLUME NAME
 local               pg_data
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## ハンズオン
 ## Dockerの基本操作
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 課題
 
 以下の課題を通してDockerの基本操作を学びます。
@@ -316,7 +347,9 @@ local               pg_data
 * bashを経由せずに、コンテナのPostgreSQLにログインする
 
 * pg、jp-pg、mnt-pgコンテナを停止・削除する
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 参考
 
 * リファレンス  
@@ -332,13 +365,19 @@ docker help
 
 
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## それでは
 
 ## 作業を始めてください
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## コンテナの用途
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### コンテナの用途(1/3)
 
 * サーバー  
@@ -346,7 +385,9 @@ docker help
 用途に応じたイメージを作成することで、サーバーを簡単に構築できます。
 また、ボリュームを使用することで、コンテナ・ホストOS間でのファイルのやり取りや、
 データを永続化することができます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### コンテナの用途(2/3)
 
 * バッチ  
@@ -369,7 +410,9 @@ open pg_data
 # 共通：コマンド完了後
 docker ps -a
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### コンテナの用途(3/3)
 
 pg_dataボリュームのデータをホストOSにコピーすることができました。
@@ -381,9 +424,13 @@ pg_dataボリュームのデータをホストOSにコピーすることがで�
 (cp -r /pg_data /backup/.)
 * コマンド終了時にコンテナを削除  
 (docker runに--rmオプションを指定)
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## コンテナ同士の連携
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### コンテナ同士の連携(1/2)
 
 Dockerでは複数のコンテナを連携することができます。
@@ -398,7 +445,9 @@ docker run -d --name pgadmin -p 80:80 --link jp-pg:jp-pg -e PHP_PG_ADMIN_SERVER_
 ```
 
 ブラウザで<a href="http://localhost" target="phppgadmin">http://localhost</a>にアクセスすると、phpPgAdminが表示できます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### コンテナ同士の連携(2/2)
 
 phpPgAdminが開いたら、"サーバー > PosgreSQL"をクリックして、"ユーザー名:postgres/パスワード:[空欄]"でログインしてください。
@@ -406,16 +455,22 @@ phpPgAdminが開いたら、"サーバー > PosgreSQL"をクリックして、"�
 jp-pgコンテナにログインすることができます。
 
 <img src="pgadmin.png"/>
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## Docker Compose
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### Docker Composeとは
 
 PostgreSQL, phpPgAdminの連携環境を作成しましたが、dockerコマンドでは各コンテナを個別に起動する必要があります。
 
 dockerには、複数のコンテナを管理する**Compose**というツールがあります。
 Composeを使用することで、複数コンテナの連携環境を1コマンドで起動・停止できます。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### Composeファイル
 
 Composeで起動するコンテナは**docker-compose.yml**で管理します。
@@ -439,10 +494,14 @@ volumes:
 上記内容の詳細と、他に記述できる内容は
 <a href="http://docs.docker.jp/compose/compose-file.html" target="compose-file">Composeファイル・リファレンス</a>
 を参照してください。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## ハンズオン
 ## Composeの作成
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 事前準備
 
 これまでのハンズオンで作成したコンテナ、ボリュームを削除します。
@@ -457,7 +516,9 @@ docker volume rm pg_data
 
 
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 課題
 
 以下の連携環境をComposeで作成してください。
@@ -471,7 +532,9 @@ docker volume rm pg_data
  * 上記PostgreSQLと連携する
 
 環境ができたら、ブラウザでphpPgAdminにアクセスし、初期化SQLが実行されたことを確認してください。
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### 参考
 
 * リファレンス  
@@ -488,13 +551,19 @@ docker-compose help
 
 
 ```
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## それでは
 
 ## 作業を始めてください
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ## まとめ
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### まとめ
 
 * Dockerの構成要素
@@ -507,58 +576,9 @@ docker-compose help
 * Compose
   * docker-compose.ymlで複数のコンテナを組み合わせて使用
   * 使用例：<a href="https://github.com/sitoolkit/sit-ds/" target="sit-ds">SI-Toolkit Dev Servers</a> 
-</script></section><section  data-markdown><script type="text/template">
+
+---
+
 ### ご清聴ありがとうございました。
 
-### ハンズオンお疲れさまでした。</script></section></div>
-    </div>
-
-    <script src=".\../dist/reveal.js"></script>
-
-    <script src=".\../plugin/markdown/markdown.js"></script>
-    <script src=".\../plugin/highlight/highlight.js"></script>
-    <script src=".\../plugin/zoom/zoom.js"></script>
-    <script src=".\../plugin/notes/notes.js"></script>
-    <script src=".\../plugin/math/math.js"></script>
-    <script>
-      function extend() {
-        var target = {};
-        for (var i = 0; i < arguments.length; i++) {
-          var source = arguments[i];
-          for (var key in source) {
-            if (source.hasOwnProperty(key)) {
-              target[key] = source[key];
-            }
-          }
-        }
-        return target;
-      }
-
-      // default options to init reveal.js
-      var defaultOptions = {
-        controls: true,
-        progress: true,
-        history: true,
-        center: true,
-        transition: 'default', // none/fade/slide/convex/concave/zoom
-        plugins: [
-          RevealMarkdown,
-          RevealHighlight,
-          RevealZoom,
-          RevealNotes,
-          RevealMath
-        ]
-      };
-
-      // options from URL query string
-      var queryOptions = Reveal().getQueryHash() || {};
-
-      var options = extend(defaultOptions, {"transition":"fade","slideNumber":true}, queryOptions);
-    </script>
-
-
-    <script>
-      Reveal.initialize(options);
-    </script>
-  </body>
-</html>
+### ハンズオンお疲れさまでした。
