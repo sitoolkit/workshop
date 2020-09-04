@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "serve": "reveal-md src -w",
-    "build": "reveal-md src --static docs"
+    "build": "rm -r docs & reveal-md src --static docs"
   },
   "devDependencies": {
     "reveal-md": "^4.1.3"
