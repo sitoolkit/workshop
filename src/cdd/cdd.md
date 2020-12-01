@@ -173,7 +173,6 @@ open docs/designdoc/index.html # macOS
 ドメインロジックの設計・実装を業務の表現に近づけるための
 クラス分類や責務割当の方法についても言及されています。
 
-
 ---
 
 ### ドメイン駆動設計 要約 (2/3)
@@ -358,7 +357,6 @@ CV を使って以下の機能を設計・実装します。
 - 支払方法はクレジットカード、代金引換が選択できる。
   - クレジットカードの場合は外部サービス(REST API)を呼び出して決済する。
 
-
 ---
 
 ### 題材 (3/3)
@@ -405,29 +403,29 @@ mkdir src¥main¥java¥a¥b¥c
 mkdir -p src/main/java/a/b/c
 ```
 
-以降ではsrc/main/java/a/b/c以下に必要なJavaパッケージ、クラスを作成するものとします。
+以降では src/main/java/a/b/c 以下に必要な Java パッケージ、クラスを作成するものとします。
 
 ---
 
 ### プロジェクト作成 (2/2)
 
-cdd-projectディレクトリにpom.xmlファイルを作成し、以下の内容を貼り付けて保存します。
+cdd-project ディレクトリに pom.xml ファイルを作成し、以下の内容を貼り付けて保存します。
 
 ```xml
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
 
-  <groupId>a.b.c</groupId>
-  <artifactId>cdd-project</artifactId>
+  &lt;groupId&gt;a.b.c&lt;/groupId&gt;
+  &lt;artifactId&gt;cdd-project&lt;/artifactId&gt;
   <version>1.0.0-SNAPSHOT</version>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
   </properties>
 
-</project>
+&lt;/project&gt;
 ```
 
 ---
@@ -475,7 +473,8 @@ public class OrderController {
   }
 }
 ```
-OrderRequestDto・OrderResponseDtoはREST APIのリクエスト・レスポンスのデータを格納するクラスです。
+
+OrderRequestDto・OrderResponseDto は REST API のリクエスト・レスポンスのデータを格納するクラスです。
 これらのクラスも同一パッケージ内に作成してください。
 
 ---
@@ -492,13 +491,13 @@ OrderRequestDto・OrderResponseDtoはREST APIのリクエスト・レスポン�
 
 ### まとめ
 
-* CVは処理全体を**主要クラス間のメッセージのやり取り**として可視化します。
-* この視点は**クラスの責務割当**や**メソッドのシグニチャ**の妥当性を判断するためにとても重要です。
-* コード駆動設計はこれらを**メソッドの中身を実装する前に最適化**を試みるアプローチです。
+- CV は処理全体を**主要クラス間のメッセージのやり取り**として可視化します。
+- この視点は**クラスの責務割当**や**メソッドのシグニチャ**の妥当性を判断するためにとても重要です。
+- コード駆動設計はこれらを**メソッドの中身を実装する前に最適化**を試みるアプローチです。
 
 ---
 
-### 補足　CRUD マトリクス
+### 補足　 CRUD マトリクス
 
 CV は起動時に--cv.analyze-sql オプションを付与すると、
 縦:エントリーポイント x 横:テーブルの CRUD マトリクスを生成します。
