@@ -414,20 +414,20 @@ mkdir -p src/main/java/a/b/c
 cdd-projectディレクトリにpom.xmlファイルを作成し、以下の内容を貼り付けて保存します。
 
 ```xml
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
 
-  <groupId>a.b.c</groupId>
-  <artifactId>cdd-project</artifactId>
+  &lt;groupId&gt;a.b.c&lt;/groupId&gt;
+  &lt;artifactId&gt;cdd-project&lt;/artifactId&gt;
   <version>1.0.0-SNAPSHOT</version>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
   </properties>
 
-</project>
+&lt;/project&gt;
 ```
 
 ---
